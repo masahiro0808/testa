@@ -39,8 +39,10 @@
     .staff-list-item.selected .staff-list-check { opacity: 1; }
     .staff-list-name { flex: 1; font-size: 14px; font-weight: 700; color: #2B3F5C; }
     .staff-list-check { font-size: 16px; opacity: 0; transition: opacity 0.15s; }
-    .staff-list-del { font-size: 13px; color: #CCC; background: none; border: none; padding: 2px 4px; cursor: pointer; flex-shrink: 0; }
-    .staff-list-del:active { color: #E05555; }
+    .staff-list-del { font-size: 13px; color: #AAA; background: rgba(255,255,255,0.15); border: none; padding: 4px 7px; border-radius: 8px; cursor: pointer; flex-shrink: 0; }
+    .staff-list-del:active { color: #E05555; background: rgba(255,255,255,0.3); }
+    .staff-list-item.selected .staff-list-del { color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.2); }
+    .staff-list-item.selected .staff-list-del:active { color: #FF8080; background: rgba(255,255,255,0.35); }
  
     /* Header */
     .header { background: #2B3F5C; padding: 16px 18px 13px; position: sticky; top: 0; z-index: 20; box-shadow: 0 2px 16px rgba(0,0,0,0.22); }
@@ -76,8 +78,8 @@
     .cat-header.open { margin-bottom: 8px; }
     .cat-header-name { color: #fff; font-size: 13px; font-weight: 700; }
     .cat-header-count { color: rgba(255,255,255,0.7); font-size: 11px; }
-    .task-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 7px; margin-bottom: 8px; }
-    .task-btn { border-radius: 12px; padding: 12px 6px 10px; text-align: center; border: 1.5px solid #E4E0DA; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.06); transition: all 0.15s; cursor: grab; touch-action: none; }
+    .task-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 5px; margin-bottom: 8px; }
+    .task-btn { border-radius: 10px; padding: 8px 4px 7px; text-align: center; border: 1.5px solid #E4E0DA; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.06); transition: all 0.15s; cursor: grab; touch-action: none; }
     .task-btn.active { transform: scale(0.96); }
     .task-btn.dragging { opacity: 0.4; cursor: grabbing; transform: scale(0.95); }
     .task-btn.drag-over { border: 2px dashed #2B3F5C !important; background: #F0EDE8 !important; }
@@ -158,6 +160,14 @@
     .edit-manage-btn { display: flex; align-items: center; gap: 5px; padding: 5px 12px; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; color: #7A9EC8; font-size: 11px; font-weight: 600; cursor: pointer; }
     .cat-header-right { display: flex; align-items: center; gap: 8px; }
  
+ 
+    /* 中項目 */
+    .subcat-header { width:100%; padding:7px 12px; border:none; border-radius:8px; display:flex; justify-content:space-between; align-items:center; margin-bottom:5px; cursor:pointer; }
+    .subcat-header-name { font-size:12px; font-weight:700; color:#fff; }
+    .subcat-header-count { font-size:10px; color:rgba(255,255,255,0.75); }
+    .subcat-ungrouped-label { font-size:10px; color:#AAA; letter-spacing:1px; margin:6px 0 4px 2px; }
+    .subcat-drop-hint { transition: background 0.15s; border-radius: 8px; }
+    .task-grid.drag-target-over .subcat-drop-hint { background: rgba(43,63,92,0.08); color: #2B3F5C !important; }
     /* Cross-category drag highlight */
     .task-grid.drag-target { background: rgba(43,63,92,0.06); border-radius: 10px; min-height: 60px; }
     .task-grid.drag-target-over { background: rgba(43,63,92,0.1); outline: 2px dashed #2B3F5C; outline-offset: 2px; }
@@ -165,6 +175,22 @@
     .color-picker-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
     .color-swatch { width: 28px; height: 28px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; transition: transform 0.1s; }
     .color-swatch.selected { border-color: #2B3F5C; transform: scale(1.15); }
+ 
+    /* Rename staff modal */
+    .rename-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.55); display: flex; align-items: center; justify-content: center; z-index: 300; padding: 24px; }
+    .rename-modal-box { background: #fff; border-radius: 20px; padding: 28px; width: 100%; max-width: 360px; }
+    .rename-modal-title { font-size: 17px; font-weight: 700; color: #2B3F5C; text-align: center; margin-bottom: 4px; }
+    .rename-modal-sub { font-size: 12px; color: #AAA; text-align: center; margin-bottom: 18px; }
+    .rename-modal-label { font-size: 11px; color: #888; margin-bottom: 5px; }
+    .rename-modal-old { font-size: 14px; font-weight: 700; color: #AAA; background: #F8F7F5; border-radius: 10px; padding: 11px 13px; margin-bottom: 12px; }
+    .rename-modal-arrow { text-align: center; font-size: 16px; color: #CCC; margin-bottom: 10px; }
+    .rename-modal-input { width: 100%; padding: 13px 14px; border: 2px solid #D0CCC8; border-radius: 12px; font-size: 16px; outline: none; margin-bottom: 6px; font-family: inherit; }
+    .rename-modal-input:focus { border-color: #2B3F5C; }
+    .rename-modal-error { font-size: 11px; color: #E05555; min-height: 16px; margin-bottom: 10px; }
+    .rename-modal-info { font-size: 11px; color: #7A9EC8; background: #F0F4FA; border-radius: 8px; padding: 8px 12px; margin-bottom: 14px; }
+    .rename-modal-btn { width: 100%; padding: 14px; background: #2B3F5C; border: none; border-radius: 12px; color: #fff; font-size: 15px; font-weight: 700; }
+    .rename-modal-btn:disabled { background: #CCC; cursor: not-allowed; }
+    .rename-modal-cancel { width: 100%; padding: 11px; margin-top: 8px; background: none; border: none; color: #AAA; font-size: 13px; cursor: pointer; }
   </style>
 </head>
 <body>
@@ -243,6 +269,7 @@
       <!-- Tab inside panel -->
       <div style="display:flex;gap:6px;margin-bottom:14px">
         <button class="edit-cat-pill selected" id="ep-tab-cat" style="background:#2B3F5C;color:#fff;flex:1;text-align:center" onclick="switchEpTab('cat')">📁 大項目</button>
+        <button class="edit-cat-pill" id="ep-tab-sub" style="flex:1;text-align:center" onclick="switchEpTab('sub')">📂 中項目</button>
         <button class="edit-cat-pill" id="ep-tab-task" style="flex:1;text-align:center" onclick="switchEpTab('task')">📌 小項目</button>
       </div>
  
@@ -258,6 +285,19 @@
         <div id="ep-cat-list"></div>
       </div>
  
+      <!-- Subcategory management -->
+      <div id="ep-sub-section" class="hidden">
+        <div class="edit-section-label">追加先の大項目</div>
+        <div class="edit-cat-selector" id="ep-sub-cat-pills"></div>
+        <div class="edit-section-label">中項目を追加</div>
+        <div class="edit-row">
+          <input class="edit-input" id="ep-new-sub-name" placeholder="中項目名（例：食事・入浴）" />
+          <button class="edit-add-btn" onclick="addSubcategory()">追加</button>
+        </div>
+        <div class="edit-section-label">中項目一覧</div>
+        <div id="ep-sub-list"></div>
+      </div>
+ 
       <!-- Task management -->
       <div id="ep-task-section" class="hidden">
         <div class="edit-section-label">小項目を追加</div>
@@ -268,6 +308,8 @@
         </div>
         <div class="edit-section-label">追加先カテゴリ</div>
         <div class="edit-cat-selector" id="ep-cat-pills"></div>
+        <div class="edit-section-label">追加先の中項目（任意）</div>
+        <div class="edit-cat-selector" id="ep-group-pills"></div>
         <div class="edit-section-label">小項目一覧</div>
         <div id="ep-task-list"></div>
       </div>
@@ -275,12 +317,28 @@
       <button class="edit-close-btn" style="width:100%;margin-top:16px" onclick="closeEditPanel()">閉じる</button>
     </div>
   </div>
+  <!-- Rename Staff Modal -->
+  <div class="rename-modal-overlay hidden" id="rename-modal">
+    <div class="rename-modal-box">
+      <div class="rename-modal-title">✏️ スタッフ名を変更</div>
+      <div class="rename-modal-sub">変更すると記録・タイムライン・履歴もすべて更新されます</div>
+      <div class="rename-modal-label">現在の名前</div>
+      <div class="rename-modal-old" id="rename-old-name"></div>
+      <div class="rename-modal-arrow">↓</div>
+      <div class="rename-modal-label">新しい名前</div>
+      <input class="rename-modal-input" id="rename-input" type="text" placeholder="新しいスタッフ名" />
+      <div class="rename-modal-error" id="rename-error"></div>
+      <div class="rename-modal-info" id="rename-info"></div>
+      <button class="rename-modal-btn" id="rename-confirm-btn">変更して保存</button>
+      <button class="rename-modal-cancel" id="rename-cancel-btn">キャンセル</button>
+    </div>
+  </div>
 </div>
  
 <script>
 // ===== DATA =====
 const DEFAULT_CATEGORIES = [
-  { name:"身体介護", color:"#4A7FB5", tasks:[
+  { name:"身体介護", color:"#4A7FB5", groups:[], tasks:[
     {id:"排泄",label:"排泄介助",icon:"🚽"},{id:"移乗",label:"移乗介助",icon:"🔄"},
     {id:"体位変換",label:"体位変換",icon:"↔️"},{id:"移動",label:"移動介助",icon:"🚶"},
     {id:"一部排泄",label:"排泄介助",icon:"🚻"},{id:"入浴",label:"入浴介助",icon:"🛁"},
@@ -290,19 +348,19 @@ const DEFAULT_CATEGORIES = [
     {id:"水分",label:"コール対応",icon:"🔔"},{id:"機能訓練",label:"機能訓練",icon:"💪"},
     {id:"医療処置",label:"バイタル測定",icon:"🩺"},
   ]},
-  { name:"看護師", color:"#7EB87A", tasks:[
+  { name:"看護師", color:"#7EB87A", groups:[], tasks:[
     {id:"診察対応",label:"診察対応",icon:"🩺"},{id:"与薬対応",label:"与薬対応",icon:"💊"},
     {id:"他直接",label:"他直接",icon:"🤝"},{id:"巡回移動",label:"巡回移動",icon:"🔁"},
     {id:"記録",label:"記録",icon:"📋"},
   ]},
-  { name:"間接業務", color:"#B8A87A", tasks:[
+  { name:"間接業務", color:"#B8A87A", groups:[], tasks:[
     {id:"連絡調整",label:"連絡調整",icon:"📞"},{id:"アセス",label:"アセスメント",icon:"📝"},
     {id:"計画",label:"計画",icon:"📅"},{id:"見守準備",label:"見守り",icon:"👁"},
     {id:"準備充電",label:"会議準備",icon:"📋"},{id:"教育指導",label:"教育指導",icon:"📚"},
     {id:"配薬下膳",label:"調理配膳下膳",icon:"🍽"},{id:"入浴準備",label:"入浴準備",icon:"🪣"},
     {id:"リネン",label:"リネン",icon:"🛏"},{id:"居室清掃",label:"居室清掃",icon:"🧹"},
   ]},
-  { name:"その他", color:"#C87A9B", tasks:[
+  { name:"その他", color:"#C87A9B", groups:[], tasks:[
     {id:"感染対策",label:"感染対策",icon:"😷"},{id:"他間接",label:"他間接",icon:"📌"},
     {id:"見守り",label:"見守り",icon:"👀"},{id:"休憩待機",label:"休憩待機",icon:"☕"},
     {id:"その他",label:"その他",icon:"⚙️"},{id:"生活支援",label:"生活支援",icon:"🏠"},
@@ -356,21 +414,26 @@ function toHHMM(date) {
 function todayStr() {
   return new Date().toLocaleDateString("ja-JP",{year:"numeric",month:"2-digit",day:"2-digit"});
 }
+function keyForStaff(name) { return KEY_RECORDS + ":" + name; }
 function saveToStorage() {
   try { localStorage.setItem(KEY_STAFF, staffName); } catch(e){}
-  try { localStorage.setItem(KEY_RECORDS, JSON.stringify(records)); } catch(e){}
+  if (staffName) { try { localStorage.setItem(keyForStaff(staffName), JSON.stringify(records)); } catch(e){} }
   try { localStorage.setItem(KEY_TASK_ORDER, JSON.stringify(taskOrder)); } catch(e){}
   try { localStorage.setItem(KEY_CATEGORIES, JSON.stringify(CATEGORIES)); } catch(e){}
   try { localStorage.setItem(KEY_STAFF_LIST, JSON.stringify(staffList)); } catch(e){}
 }
+function loadRecordsForStaff(name) {
+  try { const r = localStorage.getItem(keyForStaff(name)); return r ? JSON.parse(r) : []; } catch(e){ return []; }
+}
 function loadFromStorage() {
   try { staffName = localStorage.getItem(KEY_STAFF) || ""; } catch(e){}
-  try { const r = localStorage.getItem(KEY_RECORDS); if(r) records = JSON.parse(r); } catch(e){}
   try { const o = localStorage.getItem(KEY_TASK_ORDER); if(o) taskOrder = JSON.parse(o); } catch(e){}
   try { const c = localStorage.getItem(KEY_CATEGORIES); if(c) CATEGORIES = JSON.parse(c); } catch(e){}
   try { const s = localStorage.getItem(KEY_STAFF_LIST); if(s) staffList = JSON.parse(s); } catch(e){}
-  // ensure current staffName is in the list
   if (staffName && !staffList.includes(staffName)) staffList.push(staffName);
+  records = staffName ? loadRecordsForStaff(staffName) : [];
+  // 後方互換: groupsが無いカテゴリにはempty配列を付与
+  CATEGORIES.forEach(c => { if (!c.groups) c.groups = []; });
   rebuildCategoryColors();
 }
 function getOrderedTasks(cat) {
@@ -399,14 +462,92 @@ function renderStaffList() {
     confirmBtn.classList.add("hidden");
     return;
   }
-  el.innerHTML = staffList.map(name => `
-    <div class="staff-list-item${modalSelectedStaff === name ? " selected" : ""}" onclick="selectStaff('${name.replace(/'/g,"\\'")}')">
+  el.innerHTML = staffList.map((name, i) => `
+    <div class="staff-list-item${modalSelectedStaff === name ? " selected" : ""}" data-idx="${i}" data-action="select">
       <span class="staff-list-name">👤 ${name}</span>
       <span class="staff-list-check">✓</span>
-      <button class="staff-list-del" onclick="event.stopPropagation();deleteStaff('${name.replace(/'/g,"\\'")}')">✕</button>
+      <button class="staff-list-del" data-idx="${i}" data-action="edit" title="名前を変更">✏️</button>
+      <button class="staff-list-del" data-idx="${i}" data-action="delete" title="削除">✕</button>
     </div>`).join("");
+  // イベント登録 (data属性経由で名前を安全に取得)
+  el.querySelectorAll("[data-action]").forEach(el2 => {
+    el2.addEventListener("click", e => {
+      e.stopPropagation();
+      const idx = parseInt(el2.dataset.idx);
+      const name = staffList[idx];
+      if (!name) return;
+      const action = el2.dataset.action;
+      if (action === "select") selectStaff(name);
+      else if (action === "edit") editStaff(name);
+      else if (action === "delete") deleteStaff(name);
+    });
+  });
   confirmBtn.classList.toggle("hidden", !modalSelectedStaff);
 }
+ 
+let renameTargetName = null;
+ 
+function editStaff(oldName) {
+  renameTargetName = oldName;
+  const count = records.filter(r => r.staffName === oldName).length;
+  document.getElementById("rename-old-name").textContent = oldName;
+  document.getElementById("rename-input").value = oldName;
+  document.getElementById("rename-error").textContent = "";
+  document.getElementById("rename-info").textContent =
+    count > 0
+      ? `📋 過去の記録 ${count} 件・タイムライン・履歴もすべて「新しい名前」に更新されます`
+      : "まだ記録はありません。スタッフ名のみ変更されます。";
+  document.getElementById("rename-modal").classList.remove("hidden");
+  setTimeout(() => {
+    const inp = document.getElementById("rename-input");
+    inp.focus();
+    inp.select();
+  }, 80);
+}
+ 
+function applyRenameStaff() {
+  const oldName = renameTargetName;
+  const newName = document.getElementById("rename-input").value.trim();
+  const errEl = document.getElementById("rename-error");
+  if (!newName) { errEl.textContent = "新しい名前を入力してください"; return; }
+  if (newName === oldName) { closeRenameModal(); return; }
+  if (staffList.includes(newName)) { errEl.textContent = "同じ名前が既に登録されています"; return; }
+  errEl.textContent = "";
+  // Update staffList
+  const idx = staffList.indexOf(oldName);
+  if (idx !== -1) staffList[idx] = newName;
+  // Migrate records stored under old key to new key
+  const oldRecords = loadRecordsForStaff(oldName);
+  oldRecords.forEach(r => { r.staffName = newName; });
+  try { localStorage.setItem(keyForStaff(newName), JSON.stringify(oldRecords)); } catch(e){}
+  try { localStorage.removeItem(keyForStaff(oldName)); } catch(e){}
+  // Update in-memory records if this is the current staff
+  if (staffName === oldName) { records = oldRecords; }
+  // Update current staffName if it matches
+  if (staffName === oldName) staffName = newName;
+  if (modalSelectedStaff === oldName) modalSelectedStaff = newName;
+  saveToStorage();
+  updateHeader();
+  renderStaffList();
+  closeRenameModal();
+  // Refresh current view so timeline/history reflect the change immediately
+  renderCurrentView();
+}
+ 
+function closeRenameModal() {
+  document.getElementById("rename-modal").classList.add("hidden");
+  renameTargetName = null;
+}
+ 
+document.getElementById("rename-confirm-btn").addEventListener("click", applyRenameStaff);
+document.getElementById("rename-cancel-btn").addEventListener("click", closeRenameModal);
+document.getElementById("rename-input").addEventListener("keydown", e => {
+  if (e.key === "Enter") applyRenameStaff();
+  if (e.key === "Escape") closeRenameModal();
+});
+document.getElementById("rename-modal").addEventListener("click", function(e) {
+  if (e.target === this) closeRenameModal();
+});
  
 function selectStaff(name) {
   modalSelectedStaff = name;
@@ -417,11 +558,36 @@ function selectStaff(name) {
 }
  
 function deleteStaff(name) {
-  if (!confirm(`「${name}」を一覧から削除しますか？`)) return;
-  staffList = staffList.filter(n => n !== name);
-  if (modalSelectedStaff === name) modalSelectedStaff = null;
-  saveToStorage();
-  renderStaffList();
+  const recCount = loadRecordsForStaff(name).length;
+  const msg = recCount > 0
+    ? `「${name}」を削除しますか？\n（記録 ${recCount} 件もすべて削除されます）`
+    : `「${name}」を削除しますか？`;
+  showDeleteConfirm(msg, () => {
+    try { localStorage.removeItem(keyForStaff(name)); } catch(e){}
+    staffList = staffList.filter(n => n !== name);
+    if (modalSelectedStaff === name) modalSelectedStaff = null;
+    if (staffName === name) { staffName = ""; records = []; updateHeader(); }
+    saveToStorage();
+    renderStaffList();
+  });
+}
+ 
+function showDeleteConfirm(msg, onConfirm) {
+  const overlay = document.createElement("div");
+  overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:500;padding:24px";
+  const lines = msg.split("\n").map(l => `<div>${l}</div>`).join("");
+  overlay.innerHTML = `
+    <div style="background:#fff;border-radius:18px;padding:26px 22px;width:100%;max-width:320px;text-align:center">
+      <div style="font-size:22px;margin-bottom:10px">🗑</div>
+      <div style="font-size:14px;font-weight:700;color:#2B3F5C;margin-bottom:6px;line-height:1.6">${lines}</div>
+      <div style="display:flex;gap:8px;margin-top:18px">
+        <button id="del-cancel" style="flex:1;padding:12px;border:1.5px solid #E4E0DA;border-radius:12px;background:#F8F7F5;font-size:14px;font-weight:700;color:#888;cursor:pointer">キャンセル</button>
+        <button id="del-ok" style="flex:1;padding:12px;border:none;border-radius:12px;background:#E05555;font-size:14px;font-weight:700;color:#fff;cursor:pointer">削除する</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  overlay.querySelector("#del-cancel").addEventListener("click", () => document.body.removeChild(overlay));
+  overlay.querySelector("#del-ok").addEventListener("click", () => { document.body.removeChild(overlay); onConfirm(); });
 }
  
 function showModal(mode) {
@@ -475,9 +641,15 @@ document.getElementById("modal-confirm-btn").addEventListener("click", () => {
   if (!modalSelectedStaff) return;
   staffName = modalSelectedStaff;
   if (!staffList.includes(staffName)) staffList.push(staffName);
+  // Load this staff's own records
+  records = loadRecordsForStaff(staffName);
+  activeTask = null; startTime = null; elapsed = 0;
+  clearInterval(timerInterval); timerInterval = null;
   saveToStorage();
   hideModal();
   updateHeader();
+  updateActiveBar();
+  renderCurrentView();
 });
  
 document.getElementById("modal-cancel-btn").addEventListener("click", hideModal);
@@ -589,34 +761,87 @@ function renderCurrentView() {
   if (currentView === "history") renderHistory();
 }
  
+// ===== TASK BTN HELPER =====
+function renderTaskBtn(task, cat, visible) {
+  if (!visible) return "";
+  const isActive = activeTask && activeTask.id === task.id;
+  const border = isActive ? `2px solid ${cat.color}` : "1.5px solid #E4E0DA";
+  const bg = isActive ? cat.color : "#fff";
+  const shadow = isActive ? `0 3px 14px ${cat.color}55` : "0 1px 3px rgba(0,0,0,0.06)";
+  const scale = isActive ? "scale(0.96)" : "scale(1)";
+  return `<button class="task-btn${isActive?" active":""}" draggable="true" style="background:${bg};border:${border};box-shadow:${shadow};transform:${scale}" data-task="${task.id}" data-cat="${cat.name}">
+    <div class="task-icon">${task.icon}</div>
+    <div class="task-label${isActive?" active":""}">${task.label}</div>
+    ${isActive ? `<div class="task-elapsed">${formatTime(elapsed)}</div>` : ""}
+  </button>`;
+}
+function getOrderedTasksFromList(tasks, key) {
+  const order = taskOrder[key];
+  const taskMap = Object.fromEntries(tasks.map(t => [t.id, t]));
+  if (!order) return tasks;
+  const seen = new Set();
+  const ordered = [];
+  order.forEach(id => { if (taskMap[id] && !seen.has(id)) { ordered.push(taskMap[id]); seen.add(id); } });
+  tasks.forEach(t => { if (!seen.has(t.id)) { ordered.push(t); seen.add(t.id); } });
+  return ordered;
+}
+ 
 // ===== TIMER VIEW =====
 function renderTimerView() {
   const el = document.getElementById("view-timer");
   let html = "";
   CATEGORIES.forEach(cat => {
     const isOpen = openCats.has(cat.name);
+    const groups = cat.groups || [];
+    // all tasks in groups
+    const groupedTaskIds = new Set(groups.flatMap(g => g.tasks.map(t => t.id)));
+    // ungrouped tasks (direct cat.tasks not in any group)
+    const ungroupedTasks = (cat.tasks || []).filter(t => !groupedTaskIds.has(t.id));
+    const totalCount = groups.reduce((s,g)=>s+g.tasks.length,0) + ungroupedTasks.length;
+ 
     html += `<div style="margin-bottom:11px">
       <button class="cat-header${isOpen?" open":""}" style="background:${cat.color}" data-cat="${cat.name}">
         <span class="cat-header-name">${cat.name}</span>
-        <span class="cat-header-count">${isOpen?"▲":"▼"} ${cat.tasks.length}項目</span>
+        <span class="cat-header-count">${isOpen?"▲":"▼"} ${totalCount}項目</span>
       </button>`;
+ 
     if (isOpen) {
-      const orderedTasks = getOrderedTasks(cat);
-      html += `<div class="drag-hint">☰ 長押しでドラッグして順序を変更</div>`;
-      html += `<div class="task-grid drag-target" data-cat="${cat.name}">`;
-      orderedTasks.forEach(task => {
-        const isActive = activeTask && activeTask.id === task.id;
-        const border = isActive ? `2px solid ${cat.color}` : "1.5px solid #E4E0DA";
-        const bg = isActive ? cat.color : "#fff";
-        const shadow = isActive ? `0 3px 14px ${cat.color}55` : "0 1px 3px rgba(0,0,0,0.06)";
-        const scale = isActive ? "scale(0.96)" : "scale(1)";
-        html += `<button class="task-btn${isActive?" active":""}" draggable="true" style="background:${bg};border:${border};box-shadow:${shadow};transform:${scale}" data-task="${task.id}" data-cat="${cat.name}">
-          <div class="task-icon">${task.icon}</div>
-          <div class="task-label${isActive?" active":""}">${task.label}</div>
-          ${isActive ? `<div class="task-elapsed">${formatTime(elapsed)}</div>` : ""}
+      html += `<div class="drag-hint">☰ 長押しでドラッグ → 中項目へ移動も可</div>`;
+ 
+      // 中項目グループを表示
+      groups.forEach(grp => {
+        const grpKey = cat.name + "::grp::" + grp.name;
+        const isGrpOpen = openCats.has(grpKey);
+        html += `<button class="subcat-header" style="background:${cat.color}BB" data-grp="${grpKey}">
+          <span class="subcat-header-name">▸ ${grp.name}</span>
+          <span class="subcat-header-count">${isGrpOpen?"▲":"▼"} ${grp.tasks.length}項目</span>
         </button>`;
+        // Always render the drop zone (even when closed), but only show tasks when open
+        const orderedTasks = isGrpOpen ? getOrderedTasksFromList(grp.tasks, grpKey) : [];
+        html += `<div class="task-grid drag-target" data-cat="${cat.name}" data-grp="${grp.name}" style="margin-bottom:8px;${!isGrpOpen && grp.tasks.length===0?'min-height:28px':!isGrpOpen?'min-height:28px':''}">`;
+        if (isGrpOpen) {
+          orderedTasks.forEach(task => { html += renderTaskBtn(task, cat, true); });
+        } else {
+          // Collapsed drop hint
+          html += `<div class="subcat-drop-hint" style="font-size:10px;color:#CCC;text-align:center;padding:6px 0;width:100%">ここへドロップで追加</div>`;
+        }
+        html += `</div>`;
       });
-      html += `</div>`;
+ 
+      // 未分類小項目
+      if (ungroupedTasks.length > 0 || groups.length > 0) {
+        if (groups.length > 0) html += `<div class="subcat-ungrouped-label">未分類</div>`;
+        const orderedUngrouped = getOrderedTasksFromList(ungroupedTasks, cat.name);
+        html += `<div class="task-grid drag-target" data-cat="${cat.name}" data-grp="__ungrouped__" style="min-height:${ungroupedTasks.length===0?'28px':'auto'}">`;
+        orderedUngrouped.forEach(task => { html += renderTaskBtn(task, cat, true); });
+        if (ungroupedTasks.length === 0) html += `<div class="subcat-drop-hint" style="font-size:10px;color:#CCC;text-align:center;padding:6px 0;width:100%">ここへドロップで未分類に</div>`;
+        html += `</div>`;
+      } else if (ungroupedTasks.length > 0) {
+        const orderedUngrouped = getOrderedTasksFromList(ungroupedTasks, cat.name);
+        html += `<div class="task-grid drag-target" data-cat="${cat.name}" data-grp="__ungrouped__">`;
+        orderedUngrouped.forEach(task => { html += renderTaskBtn(task, cat, true); });
+        html += `</div>`;
+      }
     }
     html += `</div>`;
   });
@@ -630,6 +855,16 @@ function renderTimerView() {
       const name = btn.dataset.cat;
       if (openCats.has(name)) openCats.delete(name);
       else openCats.add(name);
+      renderTimerView();
+    });
+  });
+ 
+  // 中項目ヘッダーの開閉
+  el.querySelectorAll(".subcat-header").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const key = btn.dataset.grp;
+      if (openCats.has(key)) openCats.delete(key);
+      else openCats.add(key);
       renderTimerView();
     });
   });
@@ -650,12 +885,13 @@ function renderTimerView() {
     });
   });
  
-  // Drag-and-drop for task reordering (including cross-category)
-  let dragSrcId = null, dragSrcCat = null;
+  // Drag-and-drop for task reordering (including cross-category and cross-group)
+  let dragSrcId = null, dragSrcCat = null, dragSrcGrp = null;
   el.querySelectorAll(".task-btn").forEach(btn => {
     btn.addEventListener("dragstart", e => {
       dragSrcId = btn.dataset.task;
       dragSrcCat = btn.dataset.cat;
+      dragSrcGrp = btn.closest(".task-grid")?.dataset.grp || null;
       btn.classList.add("dragging");
       e.dataTransfer.effectAllowed = "move";
       e.dataTransfer.setData("text/plain", dragSrcId + "|" + dragSrcCat);
@@ -671,12 +907,14 @@ function renderTimerView() {
       btn.classList.remove("drag-over");
       const targetId = btn.dataset.task;
       const targetCat = btn.dataset.cat;
+      const targetGrp = btn.closest(".task-grid")?.dataset.grp || null;
       if (dragSrcId === targetId) return;
-      moveCrossCategory(dragSrcId, dragSrcCat, targetCat, targetId);
+      // Always use moveTaskToGroup — it handles same-group reorder and cross-group/cat moves
+      moveTaskToGroup(dragSrcId, dragSrcCat, targetCat, targetGrp, targetId);
     });
   });
  
-  // Allow dropping onto empty task-grid area (cross-category into empty/end)
+  // Allow dropping onto empty task-grid area (cross-category/group into empty/end)
   el.querySelectorAll(".task-grid").forEach(grid => {
     grid.addEventListener("dragover", e => {
       e.preventDefault();
@@ -689,8 +927,9 @@ function renderTimerView() {
       e.preventDefault();
       grid.classList.remove("drag-target-over");
       const targetCat = grid.dataset.cat;
-      if (!dragSrcId || dragSrcCat === targetCat) return;
-      moveCrossCategory(dragSrcId, dragSrcCat, targetCat, null);
+      const targetGrp = grid.dataset.grp || null;
+      if (!dragSrcId) return;
+      moveTaskToGroup(dragSrcId, dragSrcCat, targetCat, targetGrp, null);
     });
   });
  
@@ -727,6 +966,92 @@ function undo() {
 }
  
 // ===== CROSS-CATEGORY MOVE (or same-cat reorder) =====
+// Move a task between groups (subcategories) within or across categories
+function moveTaskToGroup(srcId, srcCatName, targetCatName, targetGrpName, targetId) {
+  // Locate source cat and source group
+  let srcCat = CATEGORIES.find(c => c.tasks.some(t => t.id === srcId) || (c.groups||[]).some(g=>g.tasks.some(t=>t.id===srcId)));
+  if (!srcCat) srcCat = CATEGORIES.find(c => c.name === srcCatName);
+  const targetCat = CATEGORIES.find(c => c.name === targetCatName);
+  if (!srcCat || !targetCat) return;
+ 
+  // Determine source group (null = ungrouped)
+  let srcGrp = null;
+  for (const g of (srcCat.groups||[])) {
+    if (g.tasks.some(t => t.id === srcId)) { srcGrp = g; break; }
+  }
+ 
+  // Determine target group object (null = ungrouped)
+  const targetGrp = (targetGrpName && targetGrpName !== "__ungrouped__")
+    ? (targetCat.groups||[]).find(g => g.name === targetGrpName) || null
+    : null;
+ 
+  // Keys used for taskOrder
+  const srcKey  = srcGrp  ? srcCat.name  + "::grp::" + srcGrp.name  : srcCat.name;
+  const tgtKey  = targetGrp ? targetCat.name + "::grp::" + targetGrp.name : targetCat.name;
+  const isSame  = srcKey === tgtKey;
+ 
+  pushUndo();
+ 
+  if (isSame) {
+    // ── Same group: pure reorder ──────────────────────────────────────
+    const list = srcGrp ? srcGrp.tasks : srcCat.tasks.filter(t => !(srcCat.groups||[]).some(g=>g.tasks.some(gt=>gt.id===t.id)));
+    const ordered = (taskOrder[srcKey] || list.map(t=>t.id)).filter(id => list.some(t=>t.id===id));
+    // Make sure every task in list is represented
+    list.forEach(t => { if (!ordered.includes(t.id)) ordered.push(t.id); });
+    const fromIdx = ordered.indexOf(srcId);
+    const toIdx   = targetId ? ordered.indexOf(targetId) : ordered.length - 1;
+    if (fromIdx === -1 || toIdx === -1 || fromIdx === toIdx) { undoStack.pop(); return; }
+    ordered.splice(fromIdx, 1);
+    ordered.splice(toIdx, 0, srcId);
+    taskOrder[srcKey] = ordered;
+    // Mirror reorder into the actual tasks array so data stays consistent
+    const taskArray = srcGrp ? srcGrp.tasks : srcCat.tasks;
+    taskArray.sort((a, b) => {
+      const ai = ordered.indexOf(a.id), bi = ordered.indexOf(b.id);
+      return (ai === -1 ? 9999 : ai) - (bi === -1 ? 9999 : bi);
+    });
+  } else {
+    // ── Cross-group (or cross-cat) move ──────────────────────────────
+    // Remove from source
+    const srcArray = srcGrp ? srcGrp.tasks : srcCat.tasks;
+    const srcIdx = srcArray.findIndex(t => t.id === srcId);
+    if (srcIdx === -1) { undoStack.pop(); return; }
+    const [task] = srcArray.splice(srcIdx, 1);
+ 
+    // Add to target
+    const tgtArray = targetGrp ? targetGrp.tasks : targetCat.tasks;
+    // If cross-cat ungrouped, ensure task is in targetCat.tasks
+    if (!targetGrp && srcCat !== targetCat) {
+      // just pushed into tgtArray (= targetCat.tasks) below
+    }
+    if (targetId) {
+      const toIdx = tgtArray.findIndex(t => t.id === targetId);
+      if (toIdx !== -1) tgtArray.splice(toIdx, 0, task);
+      else tgtArray.push(task);
+    } else {
+      tgtArray.push(task);
+    }
+ 
+    // Update taskOrder src: remove srcId
+    taskOrder[srcKey] = (taskOrder[srcKey] || srcArray.map(t=>t.id)).filter(id => id !== srcId);
+ 
+    // Update taskOrder tgt: insert srcId at correct position
+    const tgtOrder = (taskOrder[tgtKey] || tgtArray.map(t=>t.id)).filter(id => id !== srcId);
+    if (targetId) {
+      const i = tgtOrder.indexOf(targetId);
+      if (i !== -1) tgtOrder.splice(i, 0, srcId);
+      else tgtOrder.push(srcId);
+    } else {
+      tgtOrder.push(srcId);
+    }
+    taskOrder[tgtKey] = tgtOrder;
+  }
+ 
+  rebuildCategoryColors();
+  saveToStorage();
+  renderTimerView();
+}
+ 
 function moveCrossCategory(srcId, srcCatName, targetCatName, targetId) {
   // Find the actual current cat for this task (may differ from srcCatName after prior moves)
   let srcCat = CATEGORIES.find(c => c.tasks.some(t => t.id === srcId));
@@ -777,6 +1102,28 @@ function moveCrossCategory(srcId, srcCatName, targetCatName, targetId) {
   renderTimerView();
 }
  
+function showInputModal(title, defaultVal, onConfirm) {
+  const overlay = document.createElement("div");
+  overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:500;padding:24px";
+  overlay.innerHTML = `
+    <div style="background:#fff;border-radius:18px;padding:26px 22px;width:100%;max-width:320px">
+      <div style="font-size:15px;font-weight:700;color:#2B3F5C;margin-bottom:14px">${title}</div>
+      <input id="input-modal-field" type="text" value="${defaultVal.replace(/"/g,'&quot;')}"
+        style="width:100%;padding:12px 14px;border:2px solid #D0CCC8;border-radius:12px;font-size:15px;font-family:inherit;outline:none;box-sizing:border-box" />
+      <div style="display:flex;gap:8px;margin-top:14px">
+        <button id="input-modal-cancel" style="flex:1;padding:12px;border:1.5px solid #E4E0DA;border-radius:12px;background:#F8F7F5;font-size:14px;font-weight:700;color:#888;cursor:pointer">キャンセル</button>
+        <button id="input-modal-ok" style="flex:1;padding:12px;border:none;border-radius:12px;background:#2B3F5C;font-size:14px;font-weight:700;color:#fff;cursor:pointer">保存</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  const inp = overlay.querySelector("#input-modal-field");
+  inp.focus(); inp.select();
+  const close = () => document.body.removeChild(overlay);
+  overlay.querySelector("#input-modal-cancel").addEventListener("click", close);
+  overlay.querySelector("#input-modal-ok").addEventListener("click", () => { close(); onConfirm(inp.value.trim()); });
+  inp.addEventListener("keydown", e => { if (e.key === "Enter") { close(); onConfirm(inp.value.trim()); } if (e.key === "Escape") close(); });
+}
+ 
 // ===== EDIT PANEL =====
 const PRESET_COLORS = ["#4A7FB5","#7EB87A","#B8A87A","#C87A9B","#E07B5A","#7A9EC8","#9B7AB8","#5ABAA8","#C8A84A","#888888"];
 let epSelectedColor = "#4A7FB5";
@@ -788,6 +1135,7 @@ function openEditPanel() {
   renderEpColorPicker();
   renderEpCatList();
   renderEpCatPills();
+  renderEpGroupPills();
   renderEpTaskList();
 }
 function closeEditPanel() {
@@ -800,16 +1148,17 @@ document.getElementById("edit-panel-overlay").addEventListener("click", function
 function switchEpTab(tab) {
   currentEpTab = tab;
   document.getElementById("ep-cat-section").classList.toggle("hidden", tab !== "cat");
+  document.getElementById("ep-sub-section").classList.toggle("hidden", tab !== "sub");
   document.getElementById("ep-task-section").classList.toggle("hidden", tab !== "task");
-  const catBtn = document.getElementById("ep-tab-cat");
-  const taskBtn = document.getElementById("ep-tab-task");
-  catBtn.classList.toggle("selected", tab === "cat");
-  taskBtn.classList.toggle("selected", tab === "task");
-  catBtn.style.background = tab === "cat" ? "#2B3F5C" : "#F0EDE8";
-  catBtn.style.color = tab === "cat" ? "#fff" : "#888";
-  taskBtn.style.background = tab === "task" ? "#2B3F5C" : "#F0EDE8";
-  taskBtn.style.color = tab === "task" ? "#fff" : "#888";
+  ["cat","sub","task"].forEach(t => {
+    const id = t === "cat" ? "ep-tab-cat" : t === "sub" ? "ep-tab-sub" : "ep-tab-task";
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    btn.style.background = tab === t ? "#2B3F5C" : "#F0EDE8";
+    btn.style.color = tab === t ? "#fff" : "#888";
+  });
   if (tab === "task") { renderEpCatPills(); renderEpTaskList(); }
+  if (tab === "sub") { renderEpSubCatPills(); renderEpSubList(); }
 }
  
 function renderEpColorPicker() {
@@ -830,9 +1179,16 @@ function renderEpCatList() {
       <div class="edit-cat-dot" style="background:${cat.color}"></div>
       <span class="edit-cat-name">${cat.name}</span>
       <span style="font-size:10px;color:#AAA">${cat.tasks.length}項目</span>
-      <button class="edit-icon-btn" style="background:#F0EDE8;color:#555" onclick="editCategory(${idx})" title="編集">✏️</button>
-      <button class="edit-icon-btn" style="background:#FEE;color:#E05555" onclick="deleteCategory(${idx})" title="削除">🗑</button>
+      <button class="edit-icon-btn" style="background:#F0EDE8;color:#555" data-cat-idx="${idx}" data-action="edit-cat" title="編集">✏️</button>
+      <button class="edit-icon-btn" style="background:#FEE;color:#E05555" data-cat-idx="${idx}" data-action="del-cat" title="削除">🗑</button>
     </div>`).join("");
+  el.querySelectorAll("[data-action]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const idx = parseInt(btn.dataset.catIdx);
+      if (btn.dataset.action === "edit-cat") editCategory(idx);
+      else if (btn.dataset.action === "del-cat") deleteCategory(idx);
+    });
+  });
 }
  
 function addCategory() {
@@ -851,39 +1207,164 @@ function addCategory() {
  
 function editCategory(idx) {
   const cat = CATEGORIES[idx];
-  const newName = prompt("大項目名を編集", cat.name);
-  if (!newName || newName.trim() === cat.name) return;
-  const trimmed = newName.trim();
-  if (CATEGORIES.find((c,i) => i !== idx && c.name === trimmed)) { alert("同じ名前が既に存在します"); return; }
-  // Update taskOrder keys
-  if (taskOrder[cat.name]) {
-    taskOrder[trimmed] = taskOrder[cat.name];
-    delete taskOrder[cat.name];
-  }
-  cat.name = trimmed;
-  rebuildCategoryColors();
-  saveToStorage();
-  renderEpCatList();
-  renderEpCatPills();
-  renderTimerView();
+  showInputModal("大項目名を編集", cat.name, trimmed => {
+    if (!trimmed || trimmed === cat.name) return;
+    if (CATEGORIES.find((c,i) => i !== idx && c.name === trimmed)) { showDeleteConfirm("同じ名前が既に存在します", ()=>{}); return; }
+    if (taskOrder[cat.name]) { taskOrder[trimmed] = taskOrder[cat.name]; delete taskOrder[cat.name]; }
+    cat.name = trimmed;
+    rebuildCategoryColors();
+    saveToStorage();
+    renderEpCatList();
+    renderEpCatPills();
+    renderTimerView();
+  });
 }
  
 function deleteCategory(idx) {
   const cat = CATEGORIES[idx];
-  if (cat.tasks.length > 0) {
-    if (!confirm(`「${cat.name}」には${cat.tasks.length}個の小項目があります。\n削除すると小項目もすべて削除されます。よろしいですか？`)) return;
-  } else {
-    if (!confirm(`「${cat.name}」を削除しますか？`)) return;
+  const msg = cat.tasks.length > 0
+    ? `「${cat.name}」を削除しますか？\n（小項目 ${cat.tasks.length} 件もすべて削除されます）`
+    : `「${cat.name}」を削除しますか？`;
+  showDeleteConfirm(msg, () => {
+    CATEGORIES.splice(idx, 1);
+    delete taskOrder[cat.name];
+    if (openCats.has(cat.name)) openCats.delete(cat.name);
+    rebuildCategoryColors();
+    saveToStorage();
+    renderEpCatList();
+    renderEpCatPills();
+    renderEpTaskList();
+    renderTimerView();
+  });
+}
+ 
+// ===== SUBCATEGORY MANAGEMENT =====
+let epSelectedCatForSub = null;
+ 
+function renderEpSubCatPills() {
+  const el = document.getElementById("ep-sub-cat-pills");
+  if (!epSelectedCatForSub) epSelectedCatForSub = CATEGORIES[0]?.name || null;
+  el.innerHTML = CATEGORIES.map(cat =>
+    `<div class="edit-cat-pill${epSelectedCatForSub === cat.name ? " selected" : ""}"
+      style="${epSelectedCatForSub === cat.name ? `background:${cat.color};border-color:${cat.color};` : ""}"
+      data-subcat-sel="${cat.name}">${cat.name}</div>`
+  ).join("");
+  el.querySelectorAll("[data-subcat-sel]").forEach(pill => {
+    pill.addEventListener("click", () => {
+      epSelectedCatForSub = pill.dataset.subcatSel;
+      renderEpSubCatPills();
+      renderEpSubList();
+    });
+  });
+}
+ 
+function renderEpSubList() {
+  const el = document.getElementById("ep-sub-list");
+  const cat = CATEGORIES.find(c => c.name === epSelectedCatForSub);
+  if (!cat) { el.innerHTML = `<div style="text-align:center;color:#CCC;padding:16px;font-size:12px">大項目を選択してください</div>`; return; }
+  const groups = cat.groups || [];
+  if (groups.length === 0) {
+    el.innerHTML = `<div style="text-align:center;color:#CCC;padding:16px;font-size:12px">中項目がありません</div>`;
+    return;
   }
-  CATEGORIES.splice(idx, 1);
-  delete taskOrder[cat.name];
-  if (openCats.has(cat.name)) { openCats.delete(cat.name); }
-  rebuildCategoryColors();
+  el.innerHTML = `<div style="font-size:10px;color:#CCC;margin-bottom:6px;letter-spacing:0.5px">☰ ドラッグで順序を変更</div>` +
+    groups.map((grp, gi) => `
+    <div class="edit-cat-item" draggable="true" data-sub-drag-idx="${gi}" style="cursor:grab">
+      <span style="color:#CCC;font-size:14px;margin-right:2px;flex-shrink:0">⠿</span>
+      <div class="edit-cat-dot" style="background:${cat.color}BB"></div>
+      <span class="edit-cat-name">${grp.name}</span>
+      <span style="font-size:10px;color:#AAA">${grp.tasks.length}小項目</span>
+      <button class="edit-icon-btn" style="background:#F0EDE8;color:#555" data-sub-gi="${gi}" data-sub-action="edit" title="編集">✏️</button>
+      <button class="edit-icon-btn" style="background:#FEE;color:#E05555" data-sub-gi="${gi}" data-sub-action="delete" title="削除">🗑</button>
+    </div>`).join("");
+ 
+  // Drag to reorder subcategories
+  let subDragFrom = null;
+  el.querySelectorAll("[data-sub-drag-idx]").forEach(item => {
+    item.addEventListener("dragstart", e => {
+      subDragFrom = parseInt(item.dataset.subDragIdx);
+      e.dataTransfer.effectAllowed = "move";
+      item.style.opacity = "0.4";
+    });
+    item.addEventListener("dragend", () => { item.style.opacity = ""; el.querySelectorAll("[data-sub-drag-idx]").forEach(i=>i.style.outline=""); });
+    item.addEventListener("dragover", e => {
+      e.preventDefault();
+      el.querySelectorAll("[data-sub-drag-idx]").forEach(i=>i.style.outline="");
+      item.style.outline = `2px dashed ${cat.color}`;
+    });
+    item.addEventListener("dragleave", () => { item.style.outline = ""; });
+    item.addEventListener("drop", e => {
+      e.preventDefault();
+      item.style.outline = "";
+      const toIdx = parseInt(item.dataset.subDragIdx);
+      if (subDragFrom === null || subDragFrom === toIdx) return;
+      const [moved] = cat.groups.splice(subDragFrom, 1);
+      cat.groups.splice(toIdx, 0, moved);
+      saveToStorage();
+      renderEpSubList();
+      renderTimerView();
+    });
+  });
+ 
+  el.querySelectorAll("[data-sub-action]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const gi = parseInt(btn.dataset.subGi);
+      if (btn.dataset.subAction === "edit") editSubcategory(cat.name, gi);
+      else if (btn.dataset.subAction === "delete") deleteSubcategory(cat.name, gi);
+    });
+  });
+}
+ 
+function addSubcategory() {
+  const nameEl = document.getElementById("ep-new-sub-name");
+  const name = nameEl.value.trim();
+  if (!name) { nameEl.focus(); return; }
+  const cat = CATEGORIES.find(c => c.name === epSelectedCatForSub);
+  if (!cat) { return; }
+  if (!cat.groups) cat.groups = [];
+  if (cat.groups.find(g => g.name === name)) { showDeleteConfirm("同じ名前の中項目が既に存在します", ()=>{}); return; }
+  cat.groups.push({ name, tasks: [] });
   saveToStorage();
-  renderEpCatList();
-  renderEpCatPills();
-  renderEpTaskList();
+  nameEl.value = "";
+  renderEpSubList();
   renderTimerView();
+}
+ 
+function editSubcategory(catName, gi) {
+  const cat = CATEGORIES.find(c => c.name === catName);
+  if (!cat) return;
+  const grp = cat.groups[gi];
+  showInputModal("中項目名を編集", grp.name, trimmed => {
+    if (!trimmed || trimmed === grp.name) return;
+    // Update taskOrder key
+    const oldKey = catName + "::grp::" + grp.name;
+    const newKey = catName + "::grp::" + trimmed;
+    if (taskOrder[oldKey]) { taskOrder[newKey] = taskOrder[oldKey]; delete taskOrder[oldKey]; }
+    grp.name = trimmed;
+    saveToStorage();
+    renderEpSubList();
+    renderTimerView();
+  });
+}
+ 
+function deleteSubcategory(catName, gi) {
+  const cat = CATEGORIES.find(c => c.name === catName);
+  if (!cat) return;
+  const grp = cat.groups[gi];
+  const msg = grp.tasks.length > 0
+    ? `「${grp.name}」を削除しますか？\n（小項目 ${grp.tasks.length} 件は未分類に移動されます）`
+    : `「${grp.name}」を削除しますか？`;
+  showDeleteConfirm(msg, () => {
+    // Move tasks to ungrouped (cat.tasks)
+    grp.tasks.forEach(t => { if (!cat.tasks.find(ct => ct.id === t.id)) cat.tasks.push(t); });
+    const oldKey = catName + "::grp::" + grp.name;
+    delete taskOrder[oldKey];
+    cat.groups.splice(gi, 1);
+    saveToStorage();
+    renderEpSubList();
+    renderEpTaskList();
+    renderTimerView();
+  });
 }
  
 function renderEpCatPills() {
@@ -895,30 +1376,79 @@ function renderEpCatPills() {
       onclick="selectEpCat('${cat.name}')">${cat.name}</div>`
   ).join("");
 }
+let epSelectedGroupForTask = null;
+ 
 function selectEpCat(name) {
   epSelectedCatForTask = name;
+  epSelectedGroupForTask = null;
   renderEpCatPills();
+  renderEpGroupPills();
   renderEpTaskList();
+}
+ 
+function renderEpGroupPills() {
+  const el = document.getElementById("ep-group-pills");
+  if (!el) return;
+  const cat = CATEGORIES.find(c => c.name === epSelectedCatForTask);
+  const groups = cat?.groups || [];
+  if (groups.length === 0) {
+    el.innerHTML = `<div style="font-size:11px;color:#CCC;padding:4px 0">この大項目には中項目がありません</div>`;
+    return;
+  }
+  const pills = [{name:"未分類"}].concat(groups);
+  el.innerHTML = pills.map(grp =>
+    `<div class="edit-cat-pill${(epSelectedGroupForTask||"未分類") === grp.name ? " selected" : ""}"
+      style="${(epSelectedGroupForTask||"未分類") === grp.name ? `background:${cat?.color||"#888"};border-color:${cat?.color||"#888"};color:#fff` : ""}"
+      data-grp-sel="${grp.name}">${grp.name}</div>`
+  ).join("");
+  el.querySelectorAll("[data-grp-sel]").forEach(pill => {
+    pill.addEventListener("click", () => {
+      epSelectedGroupForTask = pill.dataset.grpSel === "未分類" ? null : pill.dataset.grpSel;
+      renderEpGroupPills();
+    });
+  });
 }
  
 function renderEpTaskList() {
   const el = document.getElementById("ep-task-list");
-  // Show all tasks grouped
-  let html = "";
-  CATEGORIES.forEach(cat => {
+  const items = [];
+  CATEGORIES.forEach((cat, cidx) => {
     if (!epSelectedCatForTask || epSelectedCatForTask === cat.name) {
-      cat.tasks.forEach((task, tidx) => {
-        html += `<div class="edit-task-item">
-          <span class="edit-task-icon">${task.icon}</span>
-          <span class="edit-task-name">${task.label}</span>
-          <span class="edit-task-cat" style="color:${cat.color}">${cat.name}</span>
-          <button class="edit-icon-btn" style="background:#F0EDE8;color:#555" onclick="editTask('${cat.name}',${tidx})" title="編集">✏️</button>
-          <button class="edit-icon-btn" style="background:#FEE;color:#E05555" onclick="deleteTask('${cat.name}',${tidx})" title="削除">🗑</button>
-        </div>`;
+      // 中項目内の小項目
+      (cat.groups || []).forEach((grp, gi) => {
+        grp.tasks.forEach((task, tidx) => {
+          items.push({ cat, cidx, task, tidx, grp, gi, inGroup: true });
+        });
+      });
+      // 未分類小項目
+      const groupedIds = new Set((cat.groups||[]).flatMap(g=>g.tasks.map(t=>t.id)));
+      cat.tasks.filter(t => !groupedIds.has(t.id)).forEach((task, tidx) => {
+        items.push({ cat, cidx, task, tidx, grp: null, gi: -1, inGroup: false });
       });
     }
   });
-  el.innerHTML = html || `<div style="text-align:center;color:#CCC;padding:20px;font-size:12px">小項目がありません</div>`;
+  if (items.length === 0) {
+    el.innerHTML = `<div style="text-align:center;color:#CCC;padding:20px;font-size:12px">小項目がありません</div>`;
+    return;
+  }
+  el.innerHTML = items.map((item, i) => {
+    const grpLabel = item.grp ? `<span style="font-size:9px;background:${item.cat.color}22;color:${item.cat.color};border-radius:6px;padding:1px 6px;margin-right:4px">${item.grp.name}</span>` : "";
+    return `<div class="edit-task-item">
+      <span class="edit-task-icon">${item.task.icon}</span>
+      <span class="edit-task-name">${grpLabel}${item.task.label}</span>
+      <span class="edit-task-cat" style="color:${item.cat.color}">${item.cat.name}</span>
+      <button class="edit-icon-btn" style="background:#F0EDE8;color:#555" data-item-idx="${i}" data-action="edit-task" title="編集">✏️</button>
+      <button class="edit-icon-btn" style="background:#FEE;color:#E05555" data-item-idx="${i}" data-action="del-task" title="削除">🗑</button>
+    </div>`;
+  }).join("");
+  el.querySelectorAll("[data-action]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const i = parseInt(btn.dataset.itemIdx);
+      const { cat, tidx, task, grp, gi } = items[i];
+      if (btn.dataset.action === "edit-task") editTask(cat.name, tidx, grp ? grp.name : null);
+      else if (btn.dataset.action === "del-task") deleteTask(cat.name, tidx, grp ? grp.name : null);
+    });
+  });
 }
  
 function addTask() {
@@ -927,11 +1457,15 @@ function addTask() {
   const icon = iconEl.value.trim() || "📌";
   const name = nameEl.value.trim();
   if (!name) { nameEl.focus(); return; }
-  if (!epSelectedCatForTask) { alert("カテゴリを選択してください"); return; }
+  if (!epSelectedCatForTask) { return; }
   const cat = CATEGORIES.find(c => c.name === epSelectedCatForTask);
   if (!cat) return;
   const id = "custom_" + Date.now();
-  cat.tasks.push({ id, label: name, icon });
+  const task = { id, label: name, icon };
+  // 中項目が選択されていればそちらに追加、なければ未分類
+  const grp = (cat.groups || []).find(g => g.name === epSelectedGroupForTask);
+  if (grp) grp.tasks.push(task);
+  else cat.tasks.push(task);
   saveToStorage();
   iconEl.value = "";
   nameEl.value = "";
@@ -940,38 +1474,128 @@ function addTask() {
   renderTimerView();
 }
  
-function editTask(catName, tidx) {
+const ICON_PRESETS = [
+  "🚽","🔄","↔️","🚶","🚻","🛁","🧼","🪥","👕","🏠","🆘","🍱","🔔","💪","🩺",
+  "💊","🤝","🔁","📋","📞","📝","📅","👁","📚","🍽","🪣","🛏","🧹","😷","📌",
+  "👀","☕","⚙️","🏥","🦽","🩹","🧴","🧻","🪑","🛒","📱","🔑","🚪","🪟","🌡",
+  "💉","🩸","🧪","🫀","🧠","🦷","👂","👃","👁️","🖐","🦵","🦶","💬","📣","🔊",
+  "⏰","📅","🗓","✅","❌","⚠️","ℹ️","🔴","🟡","🟢","🔵","⭐","🏆","🎯","🎁",
+];
+ 
+function editTask(catName, tidx, groupName) {
   const cat = CATEGORIES.find(c => c.name === catName);
   if (!cat) return;
-  const task = cat.tasks[tidx];
-  const newLabel = prompt("業務名を編集", task.label);
-  if (!newLabel || newLabel.trim() === task.label) return;
-  task.label = newLabel.trim();
-  saveToStorage();
-  renderEpTaskList();
-  renderTimerView();
+  const grp = groupName ? (cat.groups||[]).find(g => g.name === groupName) : null;
+  const taskList = grp ? grp.tasks : cat.tasks.filter(t => !((cat.groups||[]).some(g=>g.tasks.find(gt=>gt.id===t.id))));
+  const task = grp ? grp.tasks[tidx] : cat.tasks.filter(t => !((cat.groups||[]).some(g=>g.tasks.find(gt=>gt.id===t.id))))[tidx];
+  let selectedIcon = task.icon;
+ 
+  const overlay = document.createElement("div");
+  overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:500;padding:24px;overflow-y:auto";
+ 
+  const renderIcons = () => {
+    return ICON_PRESETS.map(ic => `
+      <div data-icon="${ic}" style="width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;border:2.5px solid ${ic===selectedIcon?'#2B3F5C':'transparent'};background:${ic===selectedIcon?'#EEF2F8':'#F8F7F5'};transition:all 0.1s">${ic}</div>
+    `).join("");
+  };
+ 
+  const build = () => {
+    overlay.innerHTML = `
+      <div style="background:#fff;border-radius:18px;padding:22px 18px;width:100%;max-width:360px;max-height:90vh;overflow-y:auto">
+        <div style="font-size:15px;font-weight:700;color:#2B3F5C;margin-bottom:14px">小項目を編集</div>
+ 
+        <div style="font-size:11px;color:#888;margin-bottom:6px">アイコン</div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <div id="et-icon-preview" style="width:48px;height:48px;border-radius:12px;background:#F0EDE8;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0">${selectedIcon}</div>
+          <input id="et-icon-custom" type="text" value="${selectedIcon}" maxlength="2"
+            style="width:64px;padding:10px;border:2px solid #D0CCC8;border-radius:10px;font-size:22px;text-align:center;font-family:inherit;outline:none"
+            placeholder="🔧" />
+          <span style="font-size:11px;color:#AAA">直接入力も可</span>
+        </div>
+        <div style="font-size:11px;color:#888;margin-bottom:6px">よく使うアイコン</div>
+        <div id="et-icon-grid" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px;max-height:160px;overflow-y:auto">${renderIcons()}</div>
+ 
+        <div style="font-size:11px;color:#888;margin-bottom:6px">業務名</div>
+        <input id="et-label" type="text" value="${task.label}"
+          style="width:100%;padding:12px 14px;border:2px solid #D0CCC8;border-radius:12px;font-size:15px;font-family:inherit;outline:none;box-sizing:border-box;margin-bottom:14px" />
+ 
+        <div style="display:flex;gap:8px">
+          <button id="et-cancel" style="flex:1;padding:12px;border:1.5px solid #E4E0DA;border-radius:12px;background:#F8F7F5;font-size:14px;font-weight:700;color:#888;cursor:pointer">キャンセル</button>
+          <button id="et-ok" style="flex:1;padding:12px;border:none;border-radius:12px;background:#2B3F5C;font-size:14px;font-weight:700;color:#fff;cursor:pointer">保存</button>
+        </div>
+      </div>`;
+ 
+    // Icon grid click (event delegation — no re-attach needed)
+    overlay.querySelector("#et-icon-grid").addEventListener("click", e => {
+      const cell = e.target.closest("[data-icon]");
+      if (!cell) return;
+      selectedIcon = cell.dataset.icon;
+      overlay.querySelector("#et-icon-preview").textContent = selectedIcon;
+      overlay.querySelector("#et-icon-custom").value = selectedIcon;
+      overlay.querySelector("#et-icon-grid").innerHTML = renderIcons();
+    });
+ 
+    // Custom input sync
+    overlay.querySelector("#et-icon-custom").addEventListener("input", e => {
+      const v = e.target.value.trim();
+      if (v) { selectedIcon = v; overlay.querySelector("#et-icon-preview").textContent = v; }
+    });
+ 
+    const close = () => document.body.removeChild(overlay);
+    overlay.querySelector("#et-cancel").addEventListener("click", close);
+    overlay.querySelector("#et-ok").addEventListener("click", () => {
+      const newLabel = overlay.querySelector("#et-label").value.trim();
+      const newIcon = overlay.querySelector("#et-icon-custom").value.trim() || selectedIcon;
+      close();
+      if (!newLabel) return;
+      // find actual task reference
+      const realTask = groupName
+        ? (cat.groups||[]).find(g=>g.name===groupName)?.tasks[tidx]
+        : cat.tasks.filter(t=>!((cat.groups||[]).some(g=>g.tasks.find(gt=>gt.id===t.id))))[tidx];
+      if (realTask) { realTask.label = newLabel; realTask.icon = newIcon; }
+      saveToStorage();
+      renderEpTaskList();
+      renderTimerView();
+    });
+    overlay.querySelector("#et-label").addEventListener("keydown", e => {
+      if (e.key === "Enter") overlay.querySelector("#et-ok").click();
+      if (e.key === "Escape") close();
+    });
+  };
+ 
+  build();
+  document.body.appendChild(overlay);
 }
  
-function deleteTask(catName, tidx) {
+function deleteTask(catName, tidx, groupName) {
   const cat = CATEGORIES.find(c => c.name === catName);
   if (!cat) return;
-  const task = cat.tasks[tidx];
-  if (!confirm(`「${task.label}」を削除しますか？`)) return;
-  // Remove from taskOrder
-  Object.keys(taskOrder).forEach(cn => {
-    taskOrder[cn] = (taskOrder[cn] || []).filter(id => id !== task.id);
+  const grp = groupName ? (cat.groups||[]).find(g => g.name === groupName) : null;
+  const taskList = grp ? grp.tasks : cat.tasks.filter(t => !((cat.groups||[]).some(g=>g.tasks.find(gt=>gt.id===t.id))));
+  const task = taskList[tidx];
+  if (!task) return;
+  showDeleteConfirm(`「${task.label}」を削除しますか？`, () => {
+    Object.keys(taskOrder).forEach(cn => {
+      taskOrder[cn] = (taskOrder[cn] || []).filter(id => id !== task.id);
+    });
+    if (grp) {
+      grp.tasks.splice(tidx, 1);
+    } else {
+      // find actual index in cat.tasks
+      const realIdx = cat.tasks.findIndex(t => t.id === task.id);
+      if (realIdx !== -1) cat.tasks.splice(realIdx, 1);
+    }
+    saveToStorage();
+    renderEpTaskList();
+    renderEpCatList();
+    renderTimerView();
   });
-  cat.tasks.splice(tidx, 1);
-  saveToStorage();
-  renderEpTaskList();
-  renderEpCatList();
-  renderTimerView();
 }
  
 // ===== TOUCH DRAG SUPPORT =====
 function setupTouchDrag(container) {
   let clone = null, dragSrcId = null, dragSrcCat = null, dragBtn = null;
-  let offsetX = 0, offsetY = 0;
+  let offsetX = 0, offsetY = 0, moved = false;
   let autoOpenTimer = null, lastHoveredCat = null;
  
   function cancelAutoOpen() {
@@ -1001,99 +1625,106 @@ function setupTouchDrag(container) {
     if (dragBtn) dragBtn.style.opacity = "";
     container.querySelectorAll(".task-btn").forEach(b => b.classList.remove("drag-over"));
     cancelAutoOpen();
- 
+    const srcGrp = dragBtn ? (dragBtn.closest(".task-grid")?.dataset.grp || null) : null;
     const els = document.elementsFromPoint(touch.clientX, touch.clientY);
     const target = els.find(el => el.classList.contains("task-btn") && el !== dragBtn);
     if (target && target.dataset.task !== dragSrcId) {
-      moveCrossCategory(dragSrcId, dragSrcCat, target.dataset.cat, target.dataset.task);
+      const targetGrp = target.closest(".task-grid")?.dataset.grp || null;
+      moveTaskToGroup(dragSrcId, dragSrcCat, target.dataset.cat, targetGrp, target.dataset.task);
     } else {
-      // Drop on task-grid (empty area of a category)
       const grid = els.find(el => el.classList.contains("task-grid"));
-      if (grid && grid.dataset.cat && grid.dataset.cat !== dragSrcCat) {
-        moveCrossCategory(dragSrcId, dragSrcCat, grid.dataset.cat, null);
+      if (grid && grid.dataset.cat) {
+        const targetGrp = grid.dataset.grp || null;
+        moveTaskToGroup(dragSrcId, dragSrcCat, grid.dataset.cat, targetGrp, null);
       }
     }
     dragBtn = null; dragSrcId = null; dragSrcCat = null;
   }
  
-  container.querySelectorAll(".task-btn").forEach(btn => {
-    let moved = false;
+  function fireTap(btn) {
+    const catName = btn.dataset.cat;
+    const taskId = btn.dataset.task;
+    const cat = CATEGORIES.find(c => c.name === catName);
+    if (!cat) return;
+    const task = cat.tasks.find(t => t.id === taskId);
+    if (!task) return;
+    btn._touchHandled = true;
+    const taskInfo = {...task, categoryColor: cat.color, categoryName: cat.name};
+    if (activeTask && activeTask.id === taskId) stopTask();
+    else startTask(taskInfo);
+  }
  
+  // touchstart per btn (to know which btn was pressed)
+  container.querySelectorAll(".task-btn").forEach(btn => {
     btn.addEventListener("touchstart", e => {
       moved = false;
-      const touch = e.touches[0];
-      startDrag(btn, touch);
+      startDrag(btn, e.touches[0]);
     }, { passive: true });
+  });
  
-    btn.addEventListener("touchmove", e => {
-      if (!clone) return;
-      moved = true;
-      e.preventDefault();
-      const touch = e.touches[0];
-      clone.style.left = (touch.clientX - offsetX) + "px";
-      clone.style.top  = (touch.clientY - offsetY) + "px";
+  // move/end/cancel on container so gaps are covered too
+  container.addEventListener("touchmove", e => {
+    if (!clone) return;
+    moved = true;
+    e.preventDefault();
+    const touch = e.touches[0];
+    clone.style.left = (touch.clientX - offsetX) + "px";
+    clone.style.top  = (touch.clientY - offsetY) + "px";
  
-      // Highlight target task-btn
-      container.querySelectorAll(".task-btn").forEach(b => b.classList.remove("drag-over"));
-      const els = document.elementsFromPoint(touch.clientX, touch.clientY);
-      const target = els.find(el => el.classList.contains("task-btn") && el !== btn);
-      if (target) target.classList.add("drag-over");
+    container.querySelectorAll(".task-btn").forEach(b => b.classList.remove("drag-over"));
+    const els = document.elementsFromPoint(touch.clientX, touch.clientY);
+    const target = els.find(el => el.classList.contains("task-btn") && el !== dragBtn);
+    if (target) target.classList.add("drag-over");
  
-      // Auto-open closed category header on hover
-      const catHeader = els.find(el => el.classList.contains("cat-header"));
-      if (catHeader) {
-        const catName = catHeader.dataset.cat;
-        if (catName !== lastHoveredCat) {
-          cancelAutoOpen();
-          lastHoveredCat = catName;
-          if (!openCats.has(catName)) {
-            catHeader.style.outline = "2px dashed rgba(255,255,255,0.6)";
-            autoOpenTimer = setTimeout(() => {
-              openCats.add(catName);
-              renderTimerView();
-              // Re-attach touch handlers since renderTimerView rebuilds DOM
-            }, 700);
-          }
-        }
-      } else {
+    const catHeader = els.find(el => el.classList.contains("cat-header"));
+    const subcatHeader = els.find(el => el.classList.contains("subcat-header"));
+    if (subcatHeader) {
+      const grpKey = subcatHeader.dataset.grp;
+      if (grpKey && grpKey !== lastHoveredCat) {
         cancelAutoOpen();
-      }
-    }, { passive: false });
- 
-    btn.addEventListener("touchend", e => {
-      if (!clone) return;
-      if (!moved) {
-        // treat as tap — cancel drag and fire task start/stop
-        document.body.removeChild(clone); clone = null;
-        if (dragBtn) dragBtn.style.opacity = "";
-        cancelAutoOpen();
-        const savedId = dragSrcId, savedCat = dragSrcCat;
-        dragBtn = null; dragSrcId = null; dragSrcCat = null;
-        // manually trigger task logic
-        const cat = CATEGORIES.find(c => c.name === savedCat);
-        if (cat) {
-          const task = cat.tasks.find(t => t.id === savedId);
-          if (task) {
-            btn._touchHandled = true;
-            const taskInfo = {...task, categoryColor: cat.color, categoryName: cat.name};
-            if (activeTask && activeTask.id === savedId) stopTask();
-            else startTask(taskInfo);
-          }
+        lastHoveredCat = grpKey;
+        if (!openCats.has(grpKey)) {
+          subcatHeader.style.outline = "2px dashed rgba(255,255,255,0.6)";
+          autoOpenTimer = setTimeout(() => { openCats.add(grpKey); renderTimerView(); }, 700);
         }
-        return;
       }
-      endDrag(e.changedTouches[0]);
-    });
+    } else if (catHeader) {
+    } else if (catHeader) {
+      const catName = catHeader.dataset.cat;
+      if (catName !== lastHoveredCat) {
+        cancelAutoOpen();
+        lastHoveredCat = catName;
+        if (!openCats.has(catName)) {
+          catHeader.style.outline = "2px dashed rgba(255,255,255,0.6)";
+          autoOpenTimer = setTimeout(() => { openCats.add(catName); renderTimerView(); }, 700);
+        }
+      }
+    } else {
+      cancelAutoOpen();
+    }
+  }, { passive: false });
  
-    btn.addEventListener("touchcancel", () => {
-      if (clone) { document.body.removeChild(clone); clone = null; }
+  container.addEventListener("touchend", e => {
+    if (!clone) return;
+    if (!moved) {
+      document.body.removeChild(clone); clone = null;
       if (dragBtn) dragBtn.style.opacity = "";
       cancelAutoOpen();
+      const btn = dragBtn;
       dragBtn = null; dragSrcId = null; dragSrcCat = null;
-    });
+      if (btn) fireTap(btn);
+      return;
+    }
+    endDrag(e.changedTouches[0]);
+  });
+ 
+  container.addEventListener("touchcancel", () => {
+    if (clone) { document.body.removeChild(clone); clone = null; }
+    if (dragBtn) dragBtn.style.opacity = "";
+    cancelAutoOpen();
+    dragBtn = null; dragSrcId = null; dragSrcCat = null;
   });
 }
- 
 // ===== TIMELINE =====
 function buildTimelineColumns() {
   const sorted = [...records].sort((a,b)=>a.startMs-b.startMs);
@@ -1218,21 +1849,17 @@ function renderHistory() {
       <div class="cat-totals">${catHtml}</div>`:""}
     <div class="section-label">記録一覧（新しい順）</div>
     ${records.length===0?`<div class="empty-msg">まだ記録がありません</div>`:recHtml}
-    ${records.length>0?`<button class="reset-btn" id="reset-btn">🗑 記録をすべてリセット</button>`:""}
+    ${records.length>0?`<button class="reset-btn" onclick="resetAllRecords()">🗑 記録をすべてリセット</button>`:""}
   `;
  
   document.getElementById("excel-btn").addEventListener("click", downloadExcel);
-  const resetBtn = document.getElementById("reset-btn");
-  if (resetBtn) {
-    resetBtn.addEventListener("click", () => {
-      if (confirm("記録をすべて削除しますか？")) {
-        records = [];
-        saveToStorage();
-        updateHeader();
-        renderHistory();
-      }
-    });
-  }
+}
+function resetAllRecords() {
+  if (!confirm("このスタッフの記録をすべて削除しますか？")) return;
+  records = [];
+  saveToStorage();
+  updateHeader();
+  renderHistory();
 }
  
 // ===== EXCEL =====
