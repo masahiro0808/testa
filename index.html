@@ -1,14 +1,12 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="介護タイムメモ" />
+<html lang="ja"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="介護タイムメモ">
   <title>介護タイムメモ</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;600;700&amp;display=swap" rel="stylesheet">
   <!-- SheetJS for Excel export -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
@@ -206,7 +204,7 @@
  
       <!-- New staff input -->
       <div style="display:flex;gap:8px;margin-bottom:4px">
-        <input class="modal-input" id="staff-input" type="text" placeholder="新しいスタッフ名を追加" style="margin-bottom:0;flex:1" />
+        <input class="modal-input" id="staff-input" type="text" placeholder="新しいスタッフ名を追加" style="margin-bottom:0;flex:1">
         <button class="modal-btn" id="staff-add-btn" style="width:auto;padding:0 16px;flex-shrink:0">追加</button>
       </div>
       <div id="modal-error" style="font-size:11px;color:#E05555;margin-bottom:10px;min-height:16px"></div>
@@ -224,13 +222,13 @@
       </div>
       <div>
         <div class="header-total-label">本日合計</div>
-        <div class="header-total-val" id="total-display">—</div>
+        <div class="header-total-val" id="total-display">7秒</div>
       </div>
     </div>
     <div class="staff-row">
       <button class="staff-badge" id="staff-badge-btn">
         <span>👤</span>
-        <span id="staff-name-display">—</span>
+        <span id="staff-name-display">てすと</span>
         <small>▼</small>
       </button>
       <span class="saving-label hidden" id="saving-label">保存中...</span>
@@ -240,27 +238,159 @@
     </div>
     <div class="active-task-bar hidden" id="active-task-bar">
       <div class="active-task-left">
-        <div class="pulse-dot" id="pulse-dot"></div>
-        <span id="active-icon" style="font-size:15px"></span>
-        <span class="active-task-name" id="active-name"></span>
+        <div class="pulse-dot" id="pulse-dot" style="box-shadow: rgb(78, 219, 168) 0px 0px 10px; background: rgb(78, 219, 168);"></div>
+        <span id="active-icon" style="font-size:15px">🆘</span>
+        <span class="active-task-name" id="active-name">問題対応</span>
         <span class="active-task-hint">タップで停止</span>
       </div>
-      <div class="active-task-time" id="active-time">00:00</div>
+      <div class="active-task-time" id="active-time">00:07</div>
     </div>
   </div>
  
-  <div class="tabs" id="tabs">
-    <button class="tab-btn active" data-view="timer">⏱ タイマー</button>
-    <button class="tab-btn" data-view="timeline">📊 タイムライン</button>
+  <div class="tabs" id="tabs" style="top: 110px;">
+    <button class="tab-btn" data-view="timer">⏱ タイマー</button>
+    <button class="tab-btn active" data-view="timeline">📊 タイムライン</button>
     <button class="tab-btn" data-view="history">📁 履歴</button>
   </div>
  
-  <div id="view-timer" class="timer-view"></div>
-  <div id="view-timeline" class="timeline-view hidden"></div>
+  <div id="view-timer" class="timer-view hidden"><div style="margin-bottom:11px">
+      <button class="cat-header open" style="background:#4A7FB5" data-cat="身体介護">
+        <span class="cat-header-name">身体介護</span>
+        <span class="cat-header-count">▲ 15項目</span>
+      </button><div class="drag-hint">☰ 長押しでドラッグ → 中項目へ移動も可</div><div class="task-grid drag-target" data-cat="身体介護" data-grp="__ungrouped__" style="min-height:auto"><button class="task-btn" draggable="true" style="background:#fff;border:1.5px solid #E4E0DA;box-shadow:0 1px 3px rgba(0,0,0,0.06);transform:scale(1)" data-task="排泄" data-cat="身体介護">
+    <div class="task-icon">🚽</div>
+    <div class="task-label">排泄介助</div>
+    
+  </button><button class="task-btn" draggable="true" style="background:#fff;border:1.5px solid #E4E0DA;box-shadow:0 1px 3px rgba(0,0,0,0.06);transform:scale(1)" data-task="移乗" data-cat="身体介護">
+    <div class="task-icon">🔄</div>
+    <div class="task-label">移乗介助</div>
+    
+  </button><button class="task-btn" draggable="true" style="background:#fff;border:1.5px solid #E4E0DA;box-shadow:0 1px 3px rgba(0,0,0,0.06);transform:scale(1)" data-task="体位変換" data-cat="身体介護">
+    <div class="task-icon">↔️</div>
+    <div class="task-label">体位変換</div>
+    
+  </button><button class="task-btn" draggable="true" style="background:#fff;border:1.5px solid #E4E0DA;box-shadow:0 1px 3px rgba(0,0,0,0.06);transform:scale(1)" data-task="移動" data-cat="身体介護">
+    <div class="task-icon">🚶</div>
+    <div class="task-label">移動介助</div>
+    
+  </button><button class="task-btn" draggable="true" style="background:#fff;border:1.5px solid #E4E0DA;box-shadow:0 1px 3px rgba(0,0,0,0.06);transform:scale(1)" data-task="一部排泄" data-cat="身体介護">
+    <div class="task-icon">🚻</div>
+    <div class="task-label">排泄介助</div>
+    
+  </button><button class="task-btn" draggable="true" style="background:#fff;border:1.5px solid #E4E0DA;box-shadow:0 1px 3px rgba(0,0,0,0.06);transform:scale(1)" data-task="入浴" data-cat="身体介護">
+    <div class="task-icon">🛁</div>
+    <div class="task-label">入浴介助</div>
+    
+  </button><button class="task-btn" draggable="true" style="background:#fff;border:1.5px solid #E4E0DA;box-shadow:0 1px 3px rgba(0,0,0,0.06);transform:scale(1)" data-task="清拭" data-cat="身体介護">
+    <div class="task-icon">🧼</div>
+    <div class="task-label">清拭介助</div>
+    
+  </button><button class="task-btn" draggable="true" style="background:#fff;border:1.5px solid #E4E0DA;box-shadow:0 1px 3px rgba(0,0,0,0.06);transform:scale(1)" data-task="洗面" data-cat="身体介護">
+    <div class="task-icon">🪥</div>
+    <div class="task-label">整容介助</div>
+    
+  </button><button class="task-btn" draggable="true" style="background:#fff;border:1.5px solid #E4E0DA;box-shadow:0 1px 3px rgba(0,0,0,0.06);transform:scale(1)" data-task="着替え" data-cat="身体介護">
+    <div class="task-icon">👕</div>
+    <div class="task-label">更衣介助</div>
+    
+  </button><button class="task-btn" draggable="true" style="background:#fff;border:1.5px solid #E4E0DA;box-shadow:0 1px 3px rgba(0,0,0,0.06);transform:scale(1)" data-task="口腔ケア" data-cat="身体介護">
+    <div class="task-icon">🏠</div>
+    <div class="task-label">環境整備</div>
+    
+  </button><button class="task-btn" draggable="true" style="background:#fff;border:1.5px solid #E4E0DA;box-shadow:0 1px 3px rgba(0,0,0,0.06);transform:scale(1)" data-task="問題対応" data-cat="身体介護">
+    <div class="task-icon">🆘</div>
+    <div class="task-label">問題対応</div>
+    
+  </button><button class="task-btn" draggable="true" style="background:#fff;border:1.5px solid #E4E0DA;box-shadow:0 1px 3px rgba(0,0,0,0.06);transform:scale(1)" data-task="食事" data-cat="身体介護">
+    <div class="task-icon">🍱</div>
+    <div class="task-label">食事介助</div>
+    
+  </button><button class="task-btn" draggable="true" style="background:#fff;border:1.5px solid #E4E0DA;box-shadow:0 1px 3px rgba(0,0,0,0.06);transform:scale(1)" data-task="水分" data-cat="身体介護">
+    <div class="task-icon">🔔</div>
+    <div class="task-label">コール対応</div>
+    
+  </button><button class="task-btn" draggable="true" style="background:#fff;border:1.5px solid #E4E0DA;box-shadow:0 1px 3px rgba(0,0,0,0.06);transform:scale(1)" data-task="機能訓練" data-cat="身体介護">
+    <div class="task-icon">💪</div>
+    <div class="task-label">機能訓練</div>
+    
+  </button><button class="task-btn" draggable="true" style="background:#fff;border:1.5px solid #E4E0DA;box-shadow:0 1px 3px rgba(0,0,0,0.06);transform:scale(1)" data-task="医療処置" data-cat="身体介護">
+    <div class="task-icon">🩺</div>
+    <div class="task-label">バイタル測定</div>
+    
+  </button></div></div><div style="margin-bottom:11px">
+      <button class="cat-header" style="background:#7EB87A" data-cat="看護師">
+        <span class="cat-header-name">看護師</span>
+        <span class="cat-header-count">▼ 5項目</span>
+      </button></div><div style="margin-bottom:11px">
+      <button class="cat-header" style="background:#B8A87A" data-cat="間接業務">
+        <span class="cat-header-name">間接業務</span>
+        <span class="cat-header-count">▼ 10項目</span>
+      </button></div><div style="margin-bottom:11px">
+      <button class="cat-header open" style="background:#5ABAA8" data-cat="機能訓練指導員">
+        <span class="cat-header-name">機能訓練指導員</span>
+        <span class="cat-header-count">▲ 0項目</span>
+      </button><div class="drag-hint">☰ 長押しでドラッグ → 中項目へ移動も可</div><button class="subcat-header" style="background:#5ABAA8BB" data-grp="機能訓練指導員::grp::test">
+          <span class="subcat-header-name">▸ test</span>
+          <span class="subcat-header-count">▼ 0項目</span>
+        </button><div class="task-grid drag-target" data-cat="機能訓練指導員" data-grp="test" style="margin-bottom:8px;min-height:28px"><div class="subcat-drop-hint" style="font-size:10px;color:#CCC;text-align:center;padding:6px 0;width:100%">ここへドロップで追加</div></div><div class="subcat-ungrouped-label">未分類</div><div class="task-grid drag-target" data-cat="機能訓練指導員" data-grp="__ungrouped__" style="min-height:28px"><div class="subcat-drop-hint" style="font-size:10px;color:#CCC;text-align:center;padding:6px 0;width:100%">ここへドロップで未分類に</div></div></div><div style="margin-bottom:11px">
+      <button class="cat-header open" style="background:#C87A9B" data-cat="その他">
+        <span class="cat-header-name">その他</span>
+        <span class="cat-header-count">▲ 7項目</span>
+      </button><div class="drag-hint">☰ 長押しでドラッグ → 中項目へ移動も可</div><div class="task-grid drag-target" data-cat="その他" data-grp="__ungrouped__" style="min-height:auto"><button class="task-btn" draggable="true" style="background:#fff;border:1.5px solid #E4E0DA;box-shadow:0 1px 3px rgba(0,0,0,0.06);transform:scale(1)" data-task="感染対策" data-cat="その他">
+    <div class="task-icon">😷</div>
+    <div class="task-label">感染対策</div>
+    
+  </button><button class="task-btn" draggable="true" style="background:#fff;border:1.5px solid #E4E0DA;box-shadow:0 1px 3px rgba(0,0,0,0.06);transform:scale(1)" data-task="他間接" data-cat="その他">
+    <div class="task-icon">📌</div>
+    <div class="task-label">他間接</div>
+    
+  </button><button class="task-btn" draggable="true" style="background:#fff;border:1.5px solid #E4E0DA;box-shadow:0 1px 3px rgba(0,0,0,0.06);transform:scale(1)" data-task="見守り" data-cat="その他">
+    <div class="task-icon">👀</div>
+    <div class="task-label">見守り</div>
+    
+  </button><button class="task-btn" draggable="true" style="background:#fff;border:1.5px solid #E4E0DA;box-shadow:0 1px 3px rgba(0,0,0,0.06);transform:scale(1)" data-task="休憩待機" data-cat="その他">
+    <div class="task-icon">☕</div>
+    <div class="task-label">休憩待機</div>
+    
+  </button><button class="task-btn" draggable="true" style="background:#fff;border:1.5px solid #E4E0DA;box-shadow:0 1px 3px rgba(0,0,0,0.06);transform:scale(1)" data-task="その他" data-cat="その他">
+    <div class="task-icon">⚙️</div>
+    <div class="task-label">その他</div>
+    
+  </button><button class="task-btn" draggable="true" style="background:#fff;border:1.5px solid #E4E0DA;box-shadow:0 1px 3px rgba(0,0,0,0.06);transform:scale(1)" data-task="生活支援" data-cat="その他">
+    <div class="task-icon">🏠</div>
+    <div class="task-label">生活支援</div>
+    
+  </button><button class="task-btn" draggable="true" style="background:#fff;border:1.5px solid #E4E0DA;box-shadow:0 1px 3px rgba(0,0,0,0.06);transform:scale(1)" data-task="余暇時間" data-cat="その他">
+    <div class="task-icon">🕐</div>
+    <div class="task-label">余暇時間(FREE)</div>
+    
+  </button></div></div></div>
+  <div id="view-timeline" class="timeline-view">
+    <div class="timeline-header">
+      <div style="font-size:12px;color:#888">24時間タイムライン</div>
+      <div style="font-size:11px;color:#AAA">2026/05/26 — てすと</div>
+    </div>
+    <div class="timeline-scroll" id="timeline-scroll" style="height:calc(100vh - 230px)">
+          <div class="timeline-inner" style="min-height:7200px">
+            <div class="hour-labels" style="height:7200px"><div class="hour-label" style="top:-7px">00:00</div><div class="hour-label" style="top:143px;font-size:9px;color:#CCC">:30</div><div class="hour-label" style="top:293px">01:00</div><div class="hour-label" style="top:443px;font-size:9px;color:#CCC">:30</div><div class="hour-label" style="top:593px">02:00</div><div class="hour-label" style="top:743px;font-size:9px;color:#CCC">:30</div><div class="hour-label" style="top:893px">03:00</div><div class="hour-label" style="top:1043px;font-size:9px;color:#CCC">:30</div><div class="hour-label" style="top:1193px">04:00</div><div class="hour-label" style="top:1343px;font-size:9px;color:#CCC">:30</div><div class="hour-label" style="top:1493px">05:00</div><div class="hour-label" style="top:1643px;font-size:9px;color:#CCC">:30</div><div class="hour-label" style="top:1793px">06:00</div><div class="hour-label" style="top:1943px;font-size:9px;color:#CCC">:30</div><div class="hour-label" style="top:2093px">07:00</div><div class="hour-label" style="top:2243px;font-size:9px;color:#CCC">:30</div><div class="hour-label" style="top:2393px">08:00</div><div class="hour-label" style="top:2543px;font-size:9px;color:#CCC">:30</div><div class="hour-label" style="top:2693px">09:00</div><div class="hour-label" style="top:2843px;font-size:9px;color:#CCC">:30</div><div class="hour-label" style="top:2993px">10:00</div><div class="hour-label" style="top:3143px;font-size:9px;color:#CCC">:30</div><div class="hour-label" style="top:3293px">11:00</div><div class="hour-label" style="top:3443px;font-size:9px;color:#CCC">:30</div><div class="hour-label" style="top:3593px">12:00</div><div class="hour-label" style="top:3743px;font-size:9px;color:#CCC">:30</div><div class="hour-label" style="top:3893px">13:00</div><div class="hour-label" style="top:4043px;font-size:9px;color:#CCC">:30</div><div class="hour-label" style="top:4193px">14:00</div><div class="hour-label" style="top:4343px;font-size:9px;color:#CCC">:30</div><div class="hour-label" style="top:4493px">15:00</div><div class="hour-label" style="top:4643px;font-size:9px;color:#CCC">:30</div><div class="hour-label" style="top:4793px">16:00</div><div class="hour-label" style="top:4943px;font-size:9px;color:#CCC">:30</div><div class="hour-label" style="top:5093px">17:00</div><div class="hour-label" style="top:5243px;font-size:9px;color:#CCC">:30</div><div class="hour-label" style="top:5393px">18:00</div><div class="hour-label" style="top:5543px;font-size:9px;color:#CCC">:30</div><div class="hour-label" style="top:5693px">19:00</div><div class="hour-label" style="top:5843px;font-size:9px;color:#CCC">:30</div><div class="hour-label" style="top:5993px">20:00</div><div class="hour-label" style="top:6143px;font-size:9px;color:#CCC">:30</div><div class="hour-label" style="top:6293px">21:00</div><div class="hour-label" style="top:6443px;font-size:9px;color:#CCC">:30</div><div class="hour-label" style="top:6593px">22:00</div><div class="hour-label" style="top:6743px;font-size:9px;color:#CCC">:30</div><div class="hour-label" style="top:6893px">23:00</div><div class="hour-label" style="top:7043px;font-size:9px;color:#CCC">:30</div></div>
+            <div class="timeline-grid" style="height:7200px">
+              <div class="grid-line" style="top:0px;border-top:1.5px solid #C8C4BE"></div><div class="grid-line" style="top:150px;border-top:1px dashed #F0EDE8"></div><div class="grid-line" style="top:300px;border-top:1px solid #EDE9E4"></div><div class="grid-line" style="top:450px;border-top:1px dashed #F0EDE8"></div><div class="grid-line" style="top:600px;border-top:1px solid #EDE9E4"></div><div class="grid-line" style="top:750px;border-top:1px dashed #F0EDE8"></div><div class="grid-line" style="top:900px;border-top:1px solid #EDE9E4"></div><div class="grid-line" style="top:1050px;border-top:1px dashed #F0EDE8"></div><div class="grid-line" style="top:1200px;border-top:1px solid #EDE9E4"></div><div class="grid-line" style="top:1350px;border-top:1px dashed #F0EDE8"></div><div class="grid-line" style="top:1500px;border-top:1px solid #EDE9E4"></div><div class="grid-line" style="top:1650px;border-top:1px dashed #F0EDE8"></div><div class="grid-line" style="top:1800px;border-top:1.5px solid #C8C4BE"></div><div class="grid-line" style="top:1950px;border-top:1px dashed #F0EDE8"></div><div class="grid-line" style="top:2100px;border-top:1px solid #EDE9E4"></div><div class="grid-line" style="top:2250px;border-top:1px dashed #F0EDE8"></div><div class="grid-line" style="top:2400px;border-top:1px solid #EDE9E4"></div><div class="grid-line" style="top:2550px;border-top:1px dashed #F0EDE8"></div><div class="grid-line" style="top:2700px;border-top:1px solid #EDE9E4"></div><div class="grid-line" style="top:2850px;border-top:1px dashed #F0EDE8"></div><div class="grid-line" style="top:3000px;border-top:1px solid #EDE9E4"></div><div class="grid-line" style="top:3150px;border-top:1px dashed #F0EDE8"></div><div class="grid-line" style="top:3300px;border-top:1px solid #EDE9E4"></div><div class="grid-line" style="top:3450px;border-top:1px dashed #F0EDE8"></div><div class="grid-line" style="top:3600px;border-top:1.5px solid #C8C4BE"></div><div class="grid-line" style="top:3750px;border-top:1px dashed #F0EDE8"></div><div class="grid-line" style="top:3900px;border-top:1px solid #EDE9E4"></div><div class="grid-line" style="top:4050px;border-top:1px dashed #F0EDE8"></div><div class="grid-line" style="top:4200px;border-top:1px solid #EDE9E4"></div><div class="grid-line" style="top:4350px;border-top:1px dashed #F0EDE8"></div><div class="grid-line" style="top:4500px;border-top:1px solid #EDE9E4"></div><div class="grid-line" style="top:4650px;border-top:1px dashed #F0EDE8"></div><div class="grid-line" style="top:4800px;border-top:1px solid #EDE9E4"></div><div class="grid-line" style="top:4950px;border-top:1px dashed #F0EDE8"></div><div class="grid-line" style="top:5100px;border-top:1px solid #EDE9E4"></div><div class="grid-line" style="top:5250px;border-top:1px dashed #F0EDE8"></div><div class="grid-line" style="top:5400px;border-top:1.5px solid #C8C4BE"></div><div class="grid-line" style="top:5550px;border-top:1px dashed #F0EDE8"></div><div class="grid-line" style="top:5700px;border-top:1px solid #EDE9E4"></div><div class="grid-line" style="top:5850px;border-top:1px dashed #F0EDE8"></div><div class="grid-line" style="top:6000px;border-top:1px solid #EDE9E4"></div><div class="grid-line" style="top:6150px;border-top:1px dashed #F0EDE8"></div><div class="grid-line" style="top:6300px;border-top:1px solid #EDE9E4"></div><div class="grid-line" style="top:6450px;border-top:1px dashed #F0EDE8"></div><div class="grid-line" style="top:6600px;border-top:1px solid #EDE9E4"></div><div class="grid-line" style="top:6750px;border-top:1px dashed #F0EDE8"></div><div class="grid-line" style="top:6900px;border-top:1px solid #EDE9E4"></div><div class="grid-line" style="top:7050px;border-top:1px dashed #F0EDE8"></div>
+              <div class="current-time-line" style="top:4310px">
+                <div class="current-time-dot"></div>
+              </div>
+              <div class="task-block" title="てすと: 問題対応 (14:22〜14:22)" style="top:4311px;height:20px;left:0.5%;width:99%;background:#4A7FB5DD;border:1.5px solid #4A7FB5">
+        <div class="task-block-name">🆘 問題対応</div>
+        
+      </div>
+            </div>
+          </div>
+        </div>
+    <div class="legend"><div class="legend-item"><div class="legend-dot" style="background:#4A7FB5"></div><span class="legend-label">身体介護</span></div><div class="legend-item"><div class="legend-dot" style="background:#7EB87A"></div><span class="legend-label">看護師</span></div><div class="legend-item"><div class="legend-dot" style="background:#B8A87A"></div><span class="legend-label">間接業務</span></div><div class="legend-item"><div class="legend-dot" style="background:#5ABAA8"></div><span class="legend-label">機能訓練指導員</span></div><div class="legend-item"><div class="legend-dot" style="background:#C87A9B"></div><span class="legend-label">その他</span></div></div>
+  </div>
   <div id="view-history" class="history-view hidden"></div>
  
   <!-- Edit Panel -->
-  <div class="edit-overlay hidden" id="edit-panel-overlay">
+  <div class="edit-overlay" id="edit-panel-overlay">
     <div class="edit-panel" id="edit-panel">
       <div class="edit-panel-handle"></div>
       <div class="edit-panel-title" id="ep-title">カテゴリ・項目の管理</div>
@@ -268,50 +398,183 @@
  
       <!-- Tab inside panel -->
       <div style="display:flex;gap:6px;margin-bottom:14px">
-        <button class="edit-cat-pill selected" id="ep-tab-cat" style="background:#2B3F5C;color:#fff;flex:1;text-align:center" onclick="switchEpTab('cat')">📁 大項目</button>
-        <button class="edit-cat-pill" id="ep-tab-sub" style="flex:1;text-align:center" onclick="switchEpTab('sub')">📂 中項目</button>
-        <button class="edit-cat-pill" id="ep-tab-task" style="flex:1;text-align:center" onclick="switchEpTab('task')">📌 小項目</button>
+        <button class="edit-cat-pill selected" id="ep-tab-cat" style="background: rgb(240, 237, 232); color: rgb(136, 136, 136); flex: 1 1 0%; text-align: center;" onclick="switchEpTab('cat')">📁 大項目</button>
+        <button class="edit-cat-pill" id="ep-tab-sub" style="flex: 1 1 0%; text-align: center; background: rgb(43, 63, 92); color: rgb(255, 255, 255);" onclick="switchEpTab('sub')">📂 中項目</button>
+        <button class="edit-cat-pill" id="ep-tab-task" style="flex: 1 1 0%; text-align: center; background: rgb(240, 237, 232); color: rgb(136, 136, 136);" onclick="switchEpTab('task')">📌 小項目</button>
       </div>
  
       <!-- Category management -->
-      <div id="ep-cat-section">
+      <div id="ep-cat-section" class="hidden">
         <div class="edit-section-label">大項目を追加</div>
         <div class="edit-row">
-          <input class="edit-input" id="ep-new-cat-name" placeholder="大項目名" />
+          <input class="edit-input" id="ep-new-cat-name" placeholder="大項目名">
           <button class="edit-add-btn" onclick="addCategory()">追加</button>
         </div>
-        <div class="color-picker-row" id="ep-color-picker"></div>
+        <div class="color-picker-row" id="ep-color-picker"><div class="color-swatch selected" style="background:#4A7FB5" onclick="selectEpColor('#4A7FB5')"></div><div class="color-swatch" style="background:#7EB87A" onclick="selectEpColor('#7EB87A')"></div><div class="color-swatch" style="background:#B8A87A" onclick="selectEpColor('#B8A87A')"></div><div class="color-swatch" style="background:#C87A9B" onclick="selectEpColor('#C87A9B')"></div><div class="color-swatch" style="background:#E07B5A" onclick="selectEpColor('#E07B5A')"></div><div class="color-swatch" style="background:#7A9EC8" onclick="selectEpColor('#7A9EC8')"></div><div class="color-swatch" style="background:#9B7AB8" onclick="selectEpColor('#9B7AB8')"></div><div class="color-swatch" style="background:#5ABAA8" onclick="selectEpColor('#5ABAA8')"></div><div class="color-swatch" style="background:#C8A84A" onclick="selectEpColor('#C8A84A')"></div><div class="color-swatch" style="background:#888888" onclick="selectEpColor('#888888')"></div></div>
         <div class="edit-section-label">大項目一覧</div>
-        <div id="ep-cat-list"></div>
+        <div id="ep-cat-list">
+    <div class="edit-cat-item">
+      <div class="edit-cat-dot" style="background:#4A7FB5"></div>
+      <span class="edit-cat-name">身体介護</span>
+      <span style="font-size:10px;color:#AAA">15項目</span>
+      <button class="edit-icon-btn" style="background:#F0EDE8;color:#555" data-cat-idx="0" data-action="edit-cat" title="編集">✏️</button>
+      <button class="edit-icon-btn" style="background:#FEE;color:#E05555" data-cat-idx="0" data-action="del-cat" title="削除">🗑</button>
+    </div>
+    <div class="edit-cat-item">
+      <div class="edit-cat-dot" style="background:#7EB87A"></div>
+      <span class="edit-cat-name">看護師</span>
+      <span style="font-size:10px;color:#AAA">5項目</span>
+      <button class="edit-icon-btn" style="background:#F0EDE8;color:#555" data-cat-idx="1" data-action="edit-cat" title="編集">✏️</button>
+      <button class="edit-icon-btn" style="background:#FEE;color:#E05555" data-cat-idx="1" data-action="del-cat" title="削除">🗑</button>
+    </div>
+    <div class="edit-cat-item">
+      <div class="edit-cat-dot" style="background:#B8A87A"></div>
+      <span class="edit-cat-name">間接業務</span>
+      <span style="font-size:10px;color:#AAA">10項目</span>
+      <button class="edit-icon-btn" style="background:#F0EDE8;color:#555" data-cat-idx="2" data-action="edit-cat" title="編集">✏️</button>
+      <button class="edit-icon-btn" style="background:#FEE;color:#E05555" data-cat-idx="2" data-action="del-cat" title="削除">🗑</button>
+    </div>
+    <div class="edit-cat-item">
+      <div class="edit-cat-dot" style="background:#5ABAA8"></div>
+      <span class="edit-cat-name">機能訓練指導員</span>
+      <span style="font-size:10px;color:#AAA">0項目</span>
+      <button class="edit-icon-btn" style="background:#F0EDE8;color:#555" data-cat-idx="3" data-action="edit-cat" title="編集">✏️</button>
+      <button class="edit-icon-btn" style="background:#FEE;color:#E05555" data-cat-idx="3" data-action="del-cat" title="削除">🗑</button>
+    </div>
+    <div class="edit-cat-item">
+      <div class="edit-cat-dot" style="background:#C87A9B"></div>
+      <span class="edit-cat-name">その他</span>
+      <span style="font-size:10px;color:#AAA">7項目</span>
+      <button class="edit-icon-btn" style="background:#F0EDE8;color:#555" data-cat-idx="4" data-action="edit-cat" title="編集">✏️</button>
+      <button class="edit-icon-btn" style="background:#FEE;color:#E05555" data-cat-idx="4" data-action="del-cat" title="削除">🗑</button>
+    </div></div>
       </div>
  
       <!-- Subcategory management -->
-      <div id="ep-sub-section" class="hidden">
+      <div id="ep-sub-section" class="">
         <div class="edit-section-label">追加先の大項目</div>
-        <div class="edit-cat-selector" id="ep-sub-cat-pills"></div>
+        <div class="edit-cat-selector" id="ep-sub-cat-pills"><div class="edit-cat-pill" style="" data-subcat-sel="身体介護">身体介護</div><div class="edit-cat-pill" style="" data-subcat-sel="看護師">看護師</div><div class="edit-cat-pill" style="" data-subcat-sel="間接業務">間接業務</div><div class="edit-cat-pill selected" style="background:#5ABAA8;border-color:#5ABAA8;" data-subcat-sel="機能訓練指導員">機能訓練指導員</div><div class="edit-cat-pill" style="" data-subcat-sel="その他">その他</div></div>
         <div class="edit-section-label">中項目を追加</div>
         <div class="edit-row">
-          <input class="edit-input" id="ep-new-sub-name" placeholder="中項目名（例：食事・入浴）" />
+          <input class="edit-input" id="ep-new-sub-name" placeholder="中項目名（例：食事・入浴）">
           <button class="edit-add-btn" onclick="addSubcategory()">追加</button>
         </div>
         <div class="edit-section-label">中項目一覧</div>
-        <div id="ep-sub-list"></div>
+        <div id="ep-sub-list"><div style="font-size:10px;color:#CCC;margin-bottom:6px;letter-spacing:0.5px">☰ ドラッグで順序を変更</div>
+    <div class="edit-cat-item" draggable="true" data-sub-drag-idx="0" style="cursor:grab">
+      <span style="color:#CCC;font-size:14px;margin-right:2px;flex-shrink:0">⠿</span>
+      <div class="edit-cat-dot" style="background:#5ABAA8BB"></div>
+      <span class="edit-cat-name">test</span>
+      <span style="font-size:10px;color:#AAA">0小項目</span>
+      <button class="edit-icon-btn" style="background:#F0EDE8;color:#555" data-sub-gi="0" data-sub-action="edit" title="編集">✏️</button>
+      <button class="edit-icon-btn" style="background:#FEE;color:#E05555" data-sub-gi="0" data-sub-action="delete" title="削除">🗑</button>
+    </div></div>
       </div>
  
       <!-- Task management -->
       <div id="ep-task-section" class="hidden">
         <div class="edit-section-label">小項目を追加</div>
         <div class="edit-row">
-          <input class="edit-input-sm" id="ep-new-task-icon" placeholder="🔧" maxlength="2" />
-          <input class="edit-input" id="ep-new-task-name" placeholder="業務名" />
+          <input class="edit-input-sm" id="ep-new-task-icon" placeholder="🔧" maxlength="2">
+          <input class="edit-input" id="ep-new-task-name" placeholder="業務名">
           <button class="edit-add-btn" onclick="addTask()">追加</button>
         </div>
         <div class="edit-section-label">追加先カテゴリ</div>
-        <div class="edit-cat-selector" id="ep-cat-pills"></div>
+        <div class="edit-cat-selector" id="ep-cat-pills"><div class="edit-cat-pill selected" style="background:#4A7FB5;border-color:#4A7FB5;" onclick="selectEpCat('身体介護')">身体介護</div><div class="edit-cat-pill" style="" onclick="selectEpCat('看護師')">看護師</div><div class="edit-cat-pill" style="" onclick="selectEpCat('間接業務')">間接業務</div><div class="edit-cat-pill" style="" onclick="selectEpCat('機能訓練指導員')">機能訓練指導員</div><div class="edit-cat-pill" style="" onclick="selectEpCat('その他')">その他</div></div>
         <div class="edit-section-label">追加先の中項目（任意）</div>
-        <div class="edit-cat-selector" id="ep-group-pills"></div>
+        <div class="edit-cat-selector" id="ep-group-pills"><div style="font-size:11px;color:#CCC;padding:4px 0">この大項目には中項目がありません</div></div>
         <div class="edit-section-label">小項目一覧</div>
-        <div id="ep-task-list"></div>
+        <div id="ep-task-list"><div class="edit-task-item">
+      <span class="edit-task-icon">🚽</span>
+      <span class="edit-task-name">排泄介助</span>
+      <span class="edit-task-cat" style="color:#4A7FB5">身体介護</span>
+      <button class="edit-icon-btn" style="background:#F0EDE8;color:#555" data-item-idx="0" data-action="edit-task" title="編集">✏️</button>
+      <button class="edit-icon-btn" style="background:#FEE;color:#E05555" data-item-idx="0" data-action="del-task" title="削除">🗑</button>
+    </div><div class="edit-task-item">
+      <span class="edit-task-icon">🔄</span>
+      <span class="edit-task-name">移乗介助</span>
+      <span class="edit-task-cat" style="color:#4A7FB5">身体介護</span>
+      <button class="edit-icon-btn" style="background:#F0EDE8;color:#555" data-item-idx="1" data-action="edit-task" title="編集">✏️</button>
+      <button class="edit-icon-btn" style="background:#FEE;color:#E05555" data-item-idx="1" data-action="del-task" title="削除">🗑</button>
+    </div><div class="edit-task-item">
+      <span class="edit-task-icon">↔️</span>
+      <span class="edit-task-name">体位変換</span>
+      <span class="edit-task-cat" style="color:#4A7FB5">身体介護</span>
+      <button class="edit-icon-btn" style="background:#F0EDE8;color:#555" data-item-idx="2" data-action="edit-task" title="編集">✏️</button>
+      <button class="edit-icon-btn" style="background:#FEE;color:#E05555" data-item-idx="2" data-action="del-task" title="削除">🗑</button>
+    </div><div class="edit-task-item">
+      <span class="edit-task-icon">🚶</span>
+      <span class="edit-task-name">移動介助</span>
+      <span class="edit-task-cat" style="color:#4A7FB5">身体介護</span>
+      <button class="edit-icon-btn" style="background:#F0EDE8;color:#555" data-item-idx="3" data-action="edit-task" title="編集">✏️</button>
+      <button class="edit-icon-btn" style="background:#FEE;color:#E05555" data-item-idx="3" data-action="del-task" title="削除">🗑</button>
+    </div><div class="edit-task-item">
+      <span class="edit-task-icon">🚻</span>
+      <span class="edit-task-name">排泄介助</span>
+      <span class="edit-task-cat" style="color:#4A7FB5">身体介護</span>
+      <button class="edit-icon-btn" style="background:#F0EDE8;color:#555" data-item-idx="4" data-action="edit-task" title="編集">✏️</button>
+      <button class="edit-icon-btn" style="background:#FEE;color:#E05555" data-item-idx="4" data-action="del-task" title="削除">🗑</button>
+    </div><div class="edit-task-item">
+      <span class="edit-task-icon">🛁</span>
+      <span class="edit-task-name">入浴介助</span>
+      <span class="edit-task-cat" style="color:#4A7FB5">身体介護</span>
+      <button class="edit-icon-btn" style="background:#F0EDE8;color:#555" data-item-idx="5" data-action="edit-task" title="編集">✏️</button>
+      <button class="edit-icon-btn" style="background:#FEE;color:#E05555" data-item-idx="5" data-action="del-task" title="削除">🗑</button>
+    </div><div class="edit-task-item">
+      <span class="edit-task-icon">🧼</span>
+      <span class="edit-task-name">清拭介助</span>
+      <span class="edit-task-cat" style="color:#4A7FB5">身体介護</span>
+      <button class="edit-icon-btn" style="background:#F0EDE8;color:#555" data-item-idx="6" data-action="edit-task" title="編集">✏️</button>
+      <button class="edit-icon-btn" style="background:#FEE;color:#E05555" data-item-idx="6" data-action="del-task" title="削除">🗑</button>
+    </div><div class="edit-task-item">
+      <span class="edit-task-icon">🪥</span>
+      <span class="edit-task-name">整容介助</span>
+      <span class="edit-task-cat" style="color:#4A7FB5">身体介護</span>
+      <button class="edit-icon-btn" style="background:#F0EDE8;color:#555" data-item-idx="7" data-action="edit-task" title="編集">✏️</button>
+      <button class="edit-icon-btn" style="background:#FEE;color:#E05555" data-item-idx="7" data-action="del-task" title="削除">🗑</button>
+    </div><div class="edit-task-item">
+      <span class="edit-task-icon">👕</span>
+      <span class="edit-task-name">更衣介助</span>
+      <span class="edit-task-cat" style="color:#4A7FB5">身体介護</span>
+      <button class="edit-icon-btn" style="background:#F0EDE8;color:#555" data-item-idx="8" data-action="edit-task" title="編集">✏️</button>
+      <button class="edit-icon-btn" style="background:#FEE;color:#E05555" data-item-idx="8" data-action="del-task" title="削除">🗑</button>
+    </div><div class="edit-task-item">
+      <span class="edit-task-icon">🏠</span>
+      <span class="edit-task-name">環境整備</span>
+      <span class="edit-task-cat" style="color:#4A7FB5">身体介護</span>
+      <button class="edit-icon-btn" style="background:#F0EDE8;color:#555" data-item-idx="9" data-action="edit-task" title="編集">✏️</button>
+      <button class="edit-icon-btn" style="background:#FEE;color:#E05555" data-item-idx="9" data-action="del-task" title="削除">🗑</button>
+    </div><div class="edit-task-item">
+      <span class="edit-task-icon">🆘</span>
+      <span class="edit-task-name">問題対応</span>
+      <span class="edit-task-cat" style="color:#4A7FB5">身体介護</span>
+      <button class="edit-icon-btn" style="background:#F0EDE8;color:#555" data-item-idx="10" data-action="edit-task" title="編集">✏️</button>
+      <button class="edit-icon-btn" style="background:#FEE;color:#E05555" data-item-idx="10" data-action="del-task" title="削除">🗑</button>
+    </div><div class="edit-task-item">
+      <span class="edit-task-icon">🍱</span>
+      <span class="edit-task-name">食事介助</span>
+      <span class="edit-task-cat" style="color:#4A7FB5">身体介護</span>
+      <button class="edit-icon-btn" style="background:#F0EDE8;color:#555" data-item-idx="11" data-action="edit-task" title="編集">✏️</button>
+      <button class="edit-icon-btn" style="background:#FEE;color:#E05555" data-item-idx="11" data-action="del-task" title="削除">🗑</button>
+    </div><div class="edit-task-item">
+      <span class="edit-task-icon">🔔</span>
+      <span class="edit-task-name">コール対応</span>
+      <span class="edit-task-cat" style="color:#4A7FB5">身体介護</span>
+      <button class="edit-icon-btn" style="background:#F0EDE8;color:#555" data-item-idx="12" data-action="edit-task" title="編集">✏️</button>
+      <button class="edit-icon-btn" style="background:#FEE;color:#E05555" data-item-idx="12" data-action="del-task" title="削除">🗑</button>
+    </div><div class="edit-task-item">
+      <span class="edit-task-icon">💪</span>
+      <span class="edit-task-name">機能訓練</span>
+      <span class="edit-task-cat" style="color:#4A7FB5">身体介護</span>
+      <button class="edit-icon-btn" style="background:#F0EDE8;color:#555" data-item-idx="13" data-action="edit-task" title="編集">✏️</button>
+      <button class="edit-icon-btn" style="background:#FEE;color:#E05555" data-item-idx="13" data-action="del-task" title="削除">🗑</button>
+    </div><div class="edit-task-item">
+      <span class="edit-task-icon">🩺</span>
+      <span class="edit-task-name">バイタル測定</span>
+      <span class="edit-task-cat" style="color:#4A7FB5">身体介護</span>
+      <button class="edit-icon-btn" style="background:#F0EDE8;color:#555" data-item-idx="14" data-action="edit-task" title="編集">✏️</button>
+      <button class="edit-icon-btn" style="background:#FEE;color:#E05555" data-item-idx="14" data-action="del-task" title="削除">🗑</button>
+    </div></div>
       </div>
  
       <button class="edit-close-btn" style="width:100%;margin-top:16px" onclick="closeEditPanel()">閉じる</button>
@@ -327,7 +590,7 @@
       <div class="rename-modal-old" id="rename-old-name"></div>
       <div class="rename-modal-arrow">↓</div>
       <div class="rename-modal-label">新しい名前</div>
-      <input class="rename-modal-input" id="rename-input" type="text" placeholder="新しいスタッフ名" />
+      <input class="rename-modal-input" id="rename-input" type="text" placeholder="新しいスタッフ名">
       <div class="rename-modal-error" id="rename-error"></div>
       <div class="rename-modal-info" id="rename-info"></div>
       <button class="rename-modal-btn" id="rename-confirm-btn">変更して保存</button>
@@ -339,35 +602,230 @@
 <script>
 // ===== DATA =====
 const DEFAULT_CATEGORIES = [
-  { name:"身体介護", color:"#4A7FB5", groups:[], tasks:[
-    {id:"排泄",label:"排泄介助",icon:"🚽"},{id:"移乗",label:"移乗介助",icon:"🔄"},
-    {id:"体位変換",label:"体位変換",icon:"↔️"},{id:"移動",label:"移動介助",icon:"🚶"},
-    {id:"一部排泄",label:"排泄介助",icon:"🚻"},{id:"入浴",label:"入浴介助",icon:"🛁"},
-    {id:"清拭",label:"清拭介助",icon:"🧼"},{id:"洗面",label:"整容介助",icon:"🪥"},
-    {id:"着替え",label:"更衣介助",icon:"👕"},{id:"口腔ケア",label:"環境整備",icon:"🏠"},
-    {id:"問題対応",label:"問題対応",icon:"🆘"},{id:"食事",label:"食事介助",icon:"🍱"},
-    {id:"水分",label:"コール対応",icon:"🔔"},{id:"機能訓練",label:"機能訓練",icon:"💪"},
-    {id:"医療処置",label:"バイタル測定",icon:"🩺"},
-  ]},
-  { name:"看護師", color:"#7EB87A", groups:[], tasks:[
-    {id:"診察対応",label:"診察対応",icon:"🩺"},{id:"与薬対応",label:"与薬対応",icon:"💊"},
-    {id:"他直接",label:"他直接",icon:"🤝"},{id:"巡回移動",label:"巡回移動",icon:"🔁"},
-    {id:"記録",label:"記録",icon:"📋"},
-  ]},
-  { name:"間接業務", color:"#B8A87A", groups:[], tasks:[
-    {id:"連絡調整",label:"連絡調整",icon:"📞"},{id:"アセス",label:"アセスメント",icon:"📝"},
-    {id:"計画",label:"計画",icon:"📅"},{id:"見守準備",label:"見守り",icon:"👁"},
-    {id:"準備充電",label:"会議準備",icon:"📋"},{id:"教育指導",label:"教育指導",icon:"📚"},
-    {id:"配薬下膳",label:"調理配膳下膳",icon:"🍽"},{id:"入浴準備",label:"入浴準備",icon:"🪣"},
-    {id:"リネン",label:"リネン",icon:"🛏"},{id:"居室清掃",label:"居室清掃",icon:"🧹"},
-  ]},
-  { name:"機能訓練指導員", color:"#5ABAA8", groups:[], tasks:[]},
-  { name:"その他", color:"#C87A9B", groups:[], tasks:[
-    {id:"感染対策",label:"感染対策",icon:"😷"},{id:"他間接",label:"他間接",icon:"📌"},
-    {id:"見守り",label:"見守り",icon:"👀"},{id:"休憩待機",label:"休憩待機",icon:"☕"},
-    {id:"その他",label:"その他",icon:"⚙️"},{id:"生活支援",label:"生活支援",icon:"🏠"},
-    {id:"余暇時間",label:"余暇時間(FREE)",icon:"🕐"},
-  ]},
+  {
+    "name": "身体介護",
+    "color": "#4A7FB5",
+    "groups": [],
+    "tasks": [
+      {
+        "id": "排泄",
+        "label": "排泄介助",
+        "icon": "🚽"
+      },
+      {
+        "id": "移乗",
+        "label": "移乗介助",
+        "icon": "🔄"
+      },
+      {
+        "id": "体位変換",
+        "label": "体位変換",
+        "icon": "↔️"
+      },
+      {
+        "id": "移動",
+        "label": "移動介助",
+        "icon": "🚶"
+      },
+      {
+        "id": "一部排泄",
+        "label": "排泄介助",
+        "icon": "🚻"
+      },
+      {
+        "id": "入浴",
+        "label": "入浴介助",
+        "icon": "🛁"
+      },
+      {
+        "id": "清拭",
+        "label": "清拭介助",
+        "icon": "🧼"
+      },
+      {
+        "id": "洗面",
+        "label": "整容介助",
+        "icon": "🪥"
+      },
+      {
+        "id": "着替え",
+        "label": "更衣介助",
+        "icon": "👕"
+      },
+      {
+        "id": "口腔ケア",
+        "label": "環境整備",
+        "icon": "🏠"
+      },
+      {
+        "id": "問題対応",
+        "label": "問題対応",
+        "icon": "🆘"
+      },
+      {
+        "id": "食事",
+        "label": "食事介助",
+        "icon": "🍱"
+      },
+      {
+        "id": "水分",
+        "label": "コール対応",
+        "icon": "🔔"
+      },
+      {
+        "id": "機能訓練",
+        "label": "機能訓練",
+        "icon": "💪"
+      },
+      {
+        "id": "医療処置",
+        "label": "バイタル測定",
+        "icon": "🩺"
+      }
+    ]
+  },
+  {
+    "name": "看護師",
+    "color": "#7EB87A",
+    "groups": [],
+    "tasks": [
+      {
+        "id": "診察対応",
+        "label": "診察対応",
+        "icon": "🩺"
+      },
+      {
+        "id": "与薬対応",
+        "label": "与薬対応",
+        "icon": "💊"
+      },
+      {
+        "id": "他直接",
+        "label": "他直接",
+        "icon": "🤝"
+      },
+      {
+        "id": "巡回移動",
+        "label": "巡回移動",
+        "icon": "🔁"
+      },
+      {
+        "id": "記録",
+        "label": "記録",
+        "icon": "📋"
+      }
+    ]
+  },
+  {
+    "name": "間接業務",
+    "color": "#B8A87A",
+    "groups": [],
+    "tasks": [
+      {
+        "id": "連絡調整",
+        "label": "連絡調整",
+        "icon": "📞"
+      },
+      {
+        "id": "アセス",
+        "label": "アセスメント",
+        "icon": "📝"
+      },
+      {
+        "id": "計画",
+        "label": "計画",
+        "icon": "📅"
+      },
+      {
+        "id": "見守準備",
+        "label": "見守り",
+        "icon": "👁"
+      },
+      {
+        "id": "準備充電",
+        "label": "会議準備",
+        "icon": "📋"
+      },
+      {
+        "id": "教育指導",
+        "label": "教育指導",
+        "icon": "📚"
+      },
+      {
+        "id": "配薬下膳",
+        "label": "調理配膳下膳",
+        "icon": "🍽"
+      },
+      {
+        "id": "入浴準備",
+        "label": "入浴準備",
+        "icon": "🪣"
+      },
+      {
+        "id": "リネン",
+        "label": "リネン",
+        "icon": "🛏"
+      },
+      {
+        "id": "居室清掃",
+        "label": "居室清掃",
+        "icon": "🧹"
+      }
+    ]
+  },
+  {
+    "name": "機能訓練指導員",
+    "color": "#5ABAA8",
+    "groups": [
+      {
+        "name": "test",
+        "tasks": []
+      }
+    ],
+    "tasks": []
+  },
+  {
+    "name": "その他",
+    "color": "#C87A9B",
+    "groups": [],
+    "tasks": [
+      {
+        "id": "感染対策",
+        "label": "感染対策",
+        "icon": "😷"
+      },
+      {
+        "id": "他間接",
+        "label": "他間接",
+        "icon": "📌"
+      },
+      {
+        "id": "見守り",
+        "label": "見守り",
+        "icon": "👀"
+      },
+      {
+        "id": "休憩待機",
+        "label": "休憩待機",
+        "icon": "☕"
+      },
+      {
+        "id": "その他",
+        "label": "その他",
+        "icon": "⚙️"
+      },
+      {
+        "id": "生活支援",
+        "label": "生活支援",
+        "icon": "🏠"
+      },
+      {
+        "id": "余暇時間",
+        "label": "余暇時間(FREE)",
+        "icon": "🕐"
+      }
+    ]
+  }
 ];
 let CATEGORIES = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
 let CATEGORY_COLORS = {};
@@ -1942,6 +2400,7 @@ updateHeader();
 if (!staffName) showModal("init");
 renderTimerView();
 </script>
-</body>
-</html>
+
+
  
+</body></html>
