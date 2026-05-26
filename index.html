@@ -20,7 +20,7 @@
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-thumb { background: #D0CDC8; border-radius: 4px; }
     #app { max-width: 430px; margin: 0 auto; min-height: 100vh; background: #F0EDE8; padding-bottom: 90px; }
-
+ 
     /* Modal */
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.55); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 24px; }
     .modal-box { background: #fff; border-radius: 20px; padding: 28px; width: 100%; max-width: 360px; }
@@ -32,7 +32,7 @@
     .modal-btn { width: 100%; padding: 14px; background: #2B3F5C; border: none; border-radius: 12px; color: #fff; font-size: 15px; font-weight: 700; }
     .modal-btn:disabled { background: #CCC; cursor: not-allowed; }
     .modal-cancel { width: 100%; padding: 11px; margin-top: 8px; background: none; border: none; color: #AAA; font-size: 13px; }
-
+ 
     /* Header */
     .header { background: #2B3F5C; padding: 16px 18px 13px; position: sticky; top: 0; z-index: 20; box-shadow: 0 2px 16px rgba(0,0,0,0.22); }
     .header-row { display: flex; justify-content: space-between; align-items: center; }
@@ -51,12 +51,12 @@
     .active-task-name { color: #fff; font-size: 13px; font-weight: 600; }
     .active-task-hint { color: #7A9EC8; font-size: 10px; }
     .active-task-time { color: #4EDBA8; font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
-
+ 
     /* Tabs */
     .tabs { display: flex; background: #fff; border-bottom: 1px solid #E0DDD8; position: sticky; z-index: 15; }
     .tab-btn { flex: 1; padding: 12px 0; border: none; background: none; font-size: 11px; color: #AAA; border-bottom: 2.5px solid transparent; }
     .tab-btn.active { font-weight: 700; color: #2B3F5C; border-bottom-color: #2B3F5C; }
-
+ 
     /* Timer view */
     .timer-view { padding: 14px; }
     .cat-header { width: 100%; padding: 9px 14px; border: none; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 0; }
@@ -71,7 +71,7 @@
     .task-label.active { color: #fff; }
     .task-elapsed { font-size: 12px; color: #fff; font-weight: 700; margin-top: 3px; font-variant-numeric: tabular-nums; }
     .stop-btn { position: fixed; bottom: 84px; left: 50%; transform: translateX(-50%); width: calc(100% - 28px); max-width: 402px; padding: 15px; background: #E05555; border: none; border-radius: 14px; color: #fff; font-size: 15px; font-weight: 700; box-shadow: 0 4px 18px rgba(224,85,85,0.45); z-index: 50; }
-
+ 
     /* Timeline */
     .timeline-view { padding: 14px 14px 0; }
     .timeline-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
@@ -91,7 +91,7 @@
     .legend-dot { width: 10px; height: 10px; border-radius: 3px; }
     .legend-label { font-size: 10px; color: #888; }
     .empty-msg { text-align: center; color: #CCC; padding: 60px 0; font-size: 13px; }
-
+ 
     /* History */
     .history-view { padding: 14px; }
     .excel-btn { width: 100%; padding: 13px; background: #1D7D47; border: none; border-radius: 12px; color: #fff; font-size: 14px; font-weight: 700; margin-bottom: 14px; box-shadow: 0 3px 12px rgba(29,125,71,0.35); display: flex; align-items: center; justify-content: center; gap: 8px; }
@@ -110,7 +110,7 @@
     .record-time { font-size: 11px; color: #AAA; margin-top: 2px; }
     .record-dur { font-size: 13px; font-weight: 700; flex-shrink: 0; }
     .reset-btn { width: 100%; padding: 11px; margin-top: 8px; background: none; border: 1.5px solid #E4E0DA; border-radius: 10px; color: #BBB; font-size: 12px; }
-
+ 
     .hidden { display: none !important; }
   </style>
 </head>
@@ -126,7 +126,7 @@
       <button class="modal-cancel hidden" id="modal-cancel-btn">キャンセル</button>
     </div>
   </div>
-
+ 
   <div class="header">
     <div class="header-row">
       <div>
@@ -156,30 +156,30 @@
       <div class="active-task-time" id="active-time">00:00</div>
     </div>
   </div>
-
+ 
   <div class="tabs" id="tabs">
     <button class="tab-btn active" data-view="timer">⏱ タイマー</button>
     <button class="tab-btn" data-view="timeline">📊 タイムライン</button>
     <button class="tab-btn" data-view="history">📁 履歴</button>
   </div>
-
+ 
   <div id="view-timer" class="timer-view"></div>
   <div id="view-timeline" class="timeline-view hidden"></div>
   <div id="view-history" class="history-view hidden"></div>
 </div>
-
+ 
 <script>
 // ===== DATA =====
 const CATEGORIES = [
   { name:"身体介護", color:"#4A7FB5", tasks:[
-    {id:"食事準備",label:"食事準備",icon:"🍱"},{id:"移乗介助",label:"移乗介助",icon:"🔄"},
-    {id:"体位変換",label:"体位変換",icon:"↔️"},{id:"移動介助",label:"移動介助",icon:"🚶"},
-    {id:"排泄介助",label:"排泄介助",icon:"🚻"},{id:"入浴介助",label:"入浴介助",icon:"🛁"},
-    {id:"清拭介助",label:"清拭介助",icon:"🧼"},{id:"整容介助",label:"整容介助",icon:"🪥"},
-    {id:"更衣介助",label:"更衣介助",icon:"👕"},{id:"口腔ケア",label:"口腔ケア",icon:"🦷"},
-    {id:"問題対応",label:"問題対応",icon:"🆘"},{id:"食事介助",label:"食事介助",icon:"🥗"},
-    {id:"コール対応",label:"コール対応",icon:"👂"},{id:"機能訓練",label:"機能訓練",icon:"💪"},
-    {id:"環境整備",label:"環境整備",icon:"🏠"},
+    {id:"排泄",label:"排泄",icon:"🚽"},{id:"移乗",label:"移乗",icon:"🔄"},
+    {id:"体位変換",label:"体位変換",icon:"↔️"},{id:"移動",label:"移動",icon:"🚶"},
+    {id:"一部排泄",label:"一部排泄",icon:"🚻"},{id:"入浴",label:"入浴",icon:"🛁"},
+    {id:"清拭",label:"清拭",icon:"🧼"},{id:"洗面",label:"洗面",icon:"🪥"},
+    {id:"着替え",label:"着替え",icon:"👕"},{id:"口腔ケア",label:"口腔ケア",icon:"🦷"},
+    {id:"問題対応",label:"問題対応",icon:"🆘"},{id:"食事",label:"食事",icon:"🍱"},
+    {id:"水分",label:"水分",icon:"💧"},{id:"機能訓練",label:"機能訓練",icon:"💪"},
+    {id:"医療処置",label:"医療処置",icon:"💉"},
   ]},
   { name:"医療・対応", color:"#7EB87A", tasks:[
     {id:"診察対応",label:"診察対応",icon:"🩺"},{id:"与薬対応",label:"与薬対応",icon:"💊"},
@@ -187,7 +187,7 @@ const CATEGORIES = [
     {id:"記録",label:"記録",icon:"📋"},
   ]},
   { name:"間接業務", color:"#B8A87A", tasks:[
-    {id:"連絡",label:"連絡,icon:"📞"},{id:"アセス",label:"アセス",icon:"📝"},
+    {id:"連絡調整",label:"連絡調整",icon:"📞"},{id:"アセス",label:"アセス",icon:"📝"},
     {id:"計画",label:"計画",icon:"📅"},{id:"見守準備",label:"見守準備",icon:"👁"},
     {id:"準備充電",label:"準備充電",icon:"🔋"},{id:"教育指導",label:"教育指導",icon:"📚"},
     {id:"配薬下膳",label:"配薬下膳",icon:"🍽"},{id:"入浴準備",label:"入浴準備",icon:"🪣"},
@@ -204,7 +204,7 @@ const CATEGORY_COLORS = {"身体介護":"#4A7FB5","医療・対応":"#7EB87A","�
 const PX_PER_MIN = 3;
 const KEY_STAFF = "careapp:staffName";
 const KEY_RECORDS = "careapp:records";
-
+ 
 // ===== STATE =====
 let staffName = "";
 let records = [];
@@ -216,7 +216,7 @@ let pulseState = false;
 let openCat = "身体介護";
 let currentView = "timer";
 let setupMode = "init";
-
+ 
 // ===== UTILS =====
 function formatTime(ms) {
   const s = Math.floor(ms/1000), h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
@@ -243,7 +243,7 @@ function loadFromStorage() {
   try { staffName = localStorage.getItem(KEY_STAFF) || ""; } catch(e){}
   try { const r = localStorage.getItem(KEY_RECORDS); if(r) records = JSON.parse(r); } catch(e){}
 }
-
+ 
 // ===== MODAL =====
 function showModal(mode) {
   setupMode = mode;
@@ -285,14 +285,14 @@ document.getElementById("staff-input").addEventListener("keydown", e => {
 });
 document.getElementById("modal-cancel-btn").addEventListener("click", hideModal);
 document.getElementById("staff-badge-btn").addEventListener("click", () => showModal("edit"));
-
+ 
 // ===== HEADER =====
 function updateHeader() {
   document.getElementById("staff-name-display").textContent = staffName || "未設定";
   const totalMs = records.reduce((s,r)=>s+r.duration,0);
   document.getElementById("total-display").textContent = totalMs > 0 ? formatDuration(totalMs) : "—";
 }
-
+ 
 // ===== TIMER =====
 function startTask(task) {
   if (activeTask) stopTask();
@@ -357,7 +357,7 @@ function updateActiveBar() {
   tabEl.style.top = activeTask ? "162px" : "110px";
 }
 document.getElementById("active-task-bar").addEventListener("click", stopTask);
-
+ 
 // ===== TABS =====
 document.getElementById("tabs").addEventListener("click", e => {
   const btn = e.target.closest("[data-view]");
@@ -375,7 +375,7 @@ function renderCurrentView() {
   if (currentView === "timeline") renderTimeline();
   if (currentView === "history") renderHistory();
 }
-
+ 
 // ===== TIMER VIEW =====
 function renderTimerView() {
   const el = document.getElementById("view-timer");
@@ -429,7 +429,7 @@ function renderTimerView() {
   const stopBtn = el.querySelector(".stop-btn");
   if (stopBtn) stopBtn.addEventListener("click", stopTask);
 }
-
+ 
 // ===== TIMELINE =====
 function buildTimelineColumns() {
   const sorted = [...records].sort((a,b)=>a.startMs-b.startMs);
@@ -458,7 +458,7 @@ function renderTimeline() {
   const cols = buildTimelineColumns();
   const now = new Date();
   const nowTop = (now.getHours()*60+now.getMinutes())*PX_PER_MIN;
-
+ 
   let blocksHtml = "";
   cols.forEach((col, ci) => {
     col.forEach(rec => {
@@ -474,21 +474,21 @@ function renderTimeline() {
       </div>`;
     });
   });
-
+ 
   let gridHtml = "";
   for (let h=0;h<24;h++) {
     gridHtml += `<div class="grid-line" style="top:${h*60*PX_PER_MIN}px;border-top:${h%6===0?"1.5px solid #D8D4CE":"1px solid #EDE9E4"}"></div>`;
   }
-
+ 
   let hourLabels = "";
   for (let h=0;h<24;h++) {
     hourLabels += `<div class="hour-label" style="top:${h*60*PX_PER_MIN-7}px">${String(h).padStart(2,"0")}:00</div>`;
   }
-
+ 
   let legendHtml = Object.entries(CATEGORY_COLORS).map(([name,color])=>
     `<div class="legend-item"><div class="legend-dot" style="background:${color}"></div><span class="legend-label">${name}</span></div>`
   ).join("");
-
+ 
   el.innerHTML = `
     <div class="timeline-header">
       <div style="font-size:12px;color:#888">24時間タイムライン</div>
@@ -513,19 +513,19 @@ function renderTimeline() {
   `;
   scrollTimelineToNow();
 }
-
+ 
 // ===== HISTORY =====
 function renderHistory() {
   const el = document.getElementById("view-history");
   const catTotals = {};
   records.forEach(r => { catTotals[r.categoryName]=(catTotals[r.categoryName]||0)+r.duration; });
-
+ 
   let catHtml = Object.entries(catTotals).map(([name,ms])=>`
     <div class="cat-total-card" style="border:1.5px solid ${CATEGORY_COLORS[name]||"#ddd"}">
       <div class="cat-total-name" style="color:${CATEGORY_COLORS[name]||"#888"}">${name}</div>
       <div class="cat-total-val">${formatDuration(ms)}</div>
     </div>`).join("");
-
+ 
   let recHtml = [...records].reverse().map(r=>`
     <div class="record-card">
       <div class="record-icon-wrap" style="background:${r.categoryColor}22">${r.icon}</div>
@@ -538,7 +538,7 @@ function renderHistory() {
       </div>
       <div class="record-dur" style="color:${r.categoryColor}">${formatDuration(r.duration)}</div>
     </div>`).join("");
-
+ 
   el.innerHTML = `
     <button class="excel-btn" id="excel-btn" ${records.length===0?"disabled":""}>
       <span style="font-size:18px">📥</span> Excelでダウンロード (.xlsx)
@@ -550,7 +550,7 @@ function renderHistory() {
     ${records.length===0?`<div class="empty-msg">まだ記録がありません</div>`:recHtml}
     ${records.length>0?`<button class="reset-btn" id="reset-btn">🗑 記録をすべてリセット</button>`:""}
   `;
-
+ 
   document.getElementById("excel-btn").addEventListener("click", downloadExcel);
   const resetBtn = document.getElementById("reset-btn");
   if (resetBtn) {
@@ -564,7 +564,7 @@ function renderHistory() {
     });
   }
 }
-
+ 
 // ===== EXCEL =====
 function downloadExcel() {
   const data = records.map(r=>({
@@ -591,7 +591,7 @@ function downloadExcel() {
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(summary), "スタッフ別集計");
   XLSX.writeFile(wb, `介護タイム記録_${new Date().toLocaleDateString("ja-JP").replace(/\//g,"-")}.xlsx`);
 }
-
+ 
 // ===== INIT =====
 loadFromStorage();
 updateHeader();
@@ -600,3 +600,4 @@ renderTimerView();
 </script>
 </body>
 </html>
+ 
