@@ -32,6 +32,15 @@
     .modal-btn { width: 100%; padding: 14px; background: #2B3F5C; border: none; border-radius: 12px; color: #fff; font-size: 15px; font-weight: 700; }
     .modal-btn:disabled { background: #CCC; cursor: not-allowed; }
     .modal-cancel { width: 100%; padding: 11px; margin-top: 8px; background: none; border: none; color: #AAA; font-size: 13px; }
+    .staff-list-item { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: 12px; border: 2px solid #E4E0DA; background: #F8F7F5; margin-bottom: 7px; cursor: pointer; transition: all 0.15s; }
+    .staff-list-item:active { opacity: 0.75; }
+    .staff-list-item.selected { border-color: #2B3F5C; background: #2B3F5C; }
+    .staff-list-item.selected .staff-list-name { color: #fff; }
+    .staff-list-item.selected .staff-list-check { opacity: 1; }
+    .staff-list-name { flex: 1; font-size: 14px; font-weight: 700; color: #2B3F5C; }
+    .staff-list-check { font-size: 16px; opacity: 0; transition: opacity 0.15s; }
+    .staff-list-del { font-size: 13px; color: #CCC; background: none; border: none; padding: 2px 4px; cursor: pointer; flex-shrink: 0; }
+    .staff-list-del:active { color: #E05555; }
  
     /* Header */
     .header { background: #2B3F5C; padding: 16px 18px 13px; position: sticky; top: 0; z-index: 20; box-shadow: 0 2px 16px rgba(0,0,0,0.22); }
@@ -162,11 +171,21 @@
 <div id="app">
   <div class="modal-overlay hidden" id="modal">
     <div class="modal-box">
-      <div class="modal-icon">👤</div>
-      <div class="modal-title" id="modal-title">スタッフ名を登録</div>
+      <div class="modal-icon">👥</div>
+      <div class="modal-title" id="modal-title">スタッフを選択</div>
       <div class="modal-sub" id="modal-sub">記録に氏名が自動で付与されます</div>
-      <input class="modal-input" id="staff-input" type="text" placeholder="例：山田 花子" />
-      <button class="modal-btn" id="modal-confirm-btn">登録して開始</button>
+ 
+      <!-- Staff list -->
+      <div id="staff-list" style="margin-bottom:12px;max-height:200px;overflow-y:auto"></div>
+ 
+      <!-- New staff input -->
+      <div style="display:flex;gap:8px;margin-bottom:4px">
+        <input class="modal-input" id="staff-input" type="text" placeholder="新しいスタッフ名を追加" style="margin-bottom:0;flex:1" />
+        <button class="modal-btn" id="staff-add-btn" style="width:auto;padding:0 16px;flex-shrink:0">追加</button>
+      </div>
+      <div id="modal-error" style="font-size:11px;color:#E05555;margin-bottom:10px;min-height:16px"></div>
+ 
+      <button class="modal-btn hidden" id="modal-confirm-btn">選択して開始</button>
       <button class="modal-cancel hidden" id="modal-cancel-btn">キャンセル</button>
     </div>
   </div>
@@ -190,6 +209,7 @@
       </button>
       <span class="saving-label hidden" id="saving-label">保存中...</span>
       <button class="edit-manage-btn" onclick="openEditPanel()">⚙️ 項目管理</button>
+      <button class="refresh-btn" id="undo-btn" onclick="undo()" style="display:none">↩ 戻す</button>
       <button class="refresh-btn" id="refresh-btn"><span id="refresh-icon">🔄</span> 更新</button>
     </div>
     <div class="active-task-bar hidden" id="active-task-bar">
@@ -301,16 +321,18 @@ const KEY_STAFF = "careapp:staffName";
 const KEY_RECORDS = "careapp:records";
 const KEY_TASK_ORDER = "careapp:taskOrder";
 const KEY_CATEGORIES = "careapp:categories";
+const KEY_STAFF_LIST = "careapp:staffList";
  
 // ===== STATE =====
 let staffName = "";
+let staffList = []; // all saved staff names
 let records = [];
 let activeTask = null;
 let startTime = null;
 let elapsed = 0;
 let timerInterval = null;
 let pulseState = false;
-let openCat = "身体介護";
+let openCats = new Set(["身体介護"]); // Set of open category names
 let currentView = "timer";
 let setupMode = "init";
 // taskOrder: { [catName]: [taskId, ...] }
@@ -339,65 +361,125 @@ function saveToStorage() {
   try { localStorage.setItem(KEY_RECORDS, JSON.stringify(records)); } catch(e){}
   try { localStorage.setItem(KEY_TASK_ORDER, JSON.stringify(taskOrder)); } catch(e){}
   try { localStorage.setItem(KEY_CATEGORIES, JSON.stringify(CATEGORIES)); } catch(e){}
+  try { localStorage.setItem(KEY_STAFF_LIST, JSON.stringify(staffList)); } catch(e){}
 }
 function loadFromStorage() {
   try { staffName = localStorage.getItem(KEY_STAFF) || ""; } catch(e){}
   try { const r = localStorage.getItem(KEY_RECORDS); if(r) records = JSON.parse(r); } catch(e){}
   try { const o = localStorage.getItem(KEY_TASK_ORDER); if(o) taskOrder = JSON.parse(o); } catch(e){}
   try { const c = localStorage.getItem(KEY_CATEGORIES); if(c) CATEGORIES = JSON.parse(c); } catch(e){}
+  try { const s = localStorage.getItem(KEY_STAFF_LIST); if(s) staffList = JSON.parse(s); } catch(e){}
+  // ensure current staffName is in the list
+  if (staffName && !staffList.includes(staffName)) staffList.push(staffName);
   rebuildCategoryColors();
 }
 function getOrderedTasks(cat) {
   const order = taskOrder[cat.name];
-  // Build a map of all tasks across all categories for cross-cat lookup
-  const allTaskMap = {};
-  CATEGORIES.forEach(c => c.tasks.forEach(t => { allTaskMap[t.id] = t; }));
+  // Only use tasks that actually belong to this cat
+  const taskMap = Object.fromEntries(cat.tasks.map(t => [t.id, t]));
   if (!order) return cat.tasks;
-  const ordered = order.map(id => allTaskMap[id]).filter(Boolean);
-  // append any tasks in this cat's definition not already in order
-  cat.tasks.forEach(t => { if (!order.includes(t.id)) ordered.push(t); });
+  const seen = new Set();
+  const ordered = [];
+  order.forEach(id => {
+    if (taskMap[id] && !seen.has(id)) { ordered.push(taskMap[id]); seen.add(id); }
+  });
+  // append tasks in cat not in order
+  cat.tasks.forEach(t => { if (!seen.has(t.id)) { ordered.push(t); seen.add(t.id); } });
   return ordered;
 }
  
-// ===== MODAL =====
+// ===== MODAL (Staff Selector) =====
+let modalSelectedStaff = null; // name selected in modal
+ 
+function renderStaffList() {
+  const el = document.getElementById("staff-list");
+  const confirmBtn = document.getElementById("modal-confirm-btn");
+  if (staffList.length === 0) {
+    el.innerHTML = `<div style="text-align:center;color:#CCC;font-size:12px;padding:10px 0">まだスタッフが登録されていません</div>`;
+    confirmBtn.classList.add("hidden");
+    return;
+  }
+  el.innerHTML = staffList.map(name => `
+    <div class="staff-list-item${modalSelectedStaff === name ? " selected" : ""}" onclick="selectStaff('${name.replace(/'/g,"\\'")}')">
+      <span class="staff-list-name">👤 ${name}</span>
+      <span class="staff-list-check">✓</span>
+      <button class="staff-list-del" onclick="event.stopPropagation();deleteStaff('${name.replace(/'/g,"\\'")}')">✕</button>
+    </div>`).join("");
+  confirmBtn.classList.toggle("hidden", !modalSelectedStaff);
+}
+ 
+function selectStaff(name) {
+  modalSelectedStaff = name;
+  const confirmBtn = document.getElementById("modal-confirm-btn");
+  confirmBtn.classList.remove("hidden");
+  confirmBtn.textContent = setupMode === "init" ? `${name} で開始` : `${name} に切替`;
+  renderStaffList();
+}
+ 
+function deleteStaff(name) {
+  if (!confirm(`「${name}」を一覧から削除しますか？`)) return;
+  staffList = staffList.filter(n => n !== name);
+  if (modalSelectedStaff === name) modalSelectedStaff = null;
+  saveToStorage();
+  renderStaffList();
+}
+ 
 function showModal(mode) {
   setupMode = mode;
-  const modal = document.getElementById("modal");
+  modalSelectedStaff = staffName || null;
   const title = document.getElementById("modal-title");
   const sub = document.getElementById("modal-sub");
-  const confirmBtn = document.getElementById("modal-confirm-btn");
   const cancelBtn = document.getElementById("modal-cancel-btn");
-  const input = document.getElementById("staff-input");
+  const confirmBtn = document.getElementById("modal-confirm-btn");
   if (mode === "init") {
-    title.textContent = "スタッフ名を登録";
+    title.textContent = "スタッフを選択";
     sub.textContent = "記録に氏名が自動で付与されます";
-    confirmBtn.textContent = "登録して開始";
     cancelBtn.classList.add("hidden");
-    input.value = "";
   } else {
-    title.textContent = "スタッフ名を変更";
-    sub.textContent = "変更後の記録から新しい名前が使われます";
-    confirmBtn.textContent = "変更する";
+    title.textContent = "スタッフを切替";
+    sub.textContent = "選択したスタッフで記録を続けます";
     cancelBtn.classList.remove("hidden");
-    input.value = staffName;
   }
-  modal.classList.remove("hidden");
-  setTimeout(() => input.focus(), 100);
+  confirmBtn.textContent = modalSelectedStaff
+    ? (mode === "init" ? `${modalSelectedStaff} で開始` : `${modalSelectedStaff} に切替`)
+    : "選択して開始";
+  document.getElementById("staff-input").value = "";
+  document.getElementById("modal-error").textContent = "";
+  document.getElementById("modal").classList.remove("hidden");
+  renderStaffList();
 }
+ 
 function hideModal() {
   document.getElementById("modal").classList.add("hidden");
 }
+ 
+// Add new staff
+document.getElementById("staff-add-btn").addEventListener("click", () => {
+  const input = document.getElementById("staff-input");
+  const name = input.value.trim();
+  const errEl = document.getElementById("modal-error");
+  if (!name) { errEl.textContent = "名前を入力してください"; input.focus(); return; }
+  if (staffList.includes(name)) { errEl.textContent = "同じ名前が既に登録されています"; return; }
+  errEl.textContent = "";
+  staffList.push(name);
+  saveToStorage();
+  input.value = "";
+  selectStaff(name);
+});
+document.getElementById("staff-input").addEventListener("keydown", e => {
+  if (e.key === "Enter") document.getElementById("staff-add-btn").click();
+});
+ 
+// Confirm selection
 document.getElementById("modal-confirm-btn").addEventListener("click", () => {
-  const val = document.getElementById("staff-input").value.trim();
-  if (!val) return;
-  staffName = val;
+  if (!modalSelectedStaff) return;
+  staffName = modalSelectedStaff;
+  if (!staffList.includes(staffName)) staffList.push(staffName);
   saveToStorage();
   hideModal();
   updateHeader();
 });
-document.getElementById("staff-input").addEventListener("keydown", e => {
-  if (e.key === "Enter") document.getElementById("modal-confirm-btn").click();
-});
+ 
 document.getElementById("modal-cancel-btn").addEventListener("click", hideModal);
 document.getElementById("staff-badge-btn").addEventListener("click", () => showModal("edit"));
  
@@ -409,10 +491,17 @@ function updateHeader() {
 }
  
 document.getElementById("refresh-btn").addEventListener("click", () => {
+  if (!confirm("更新すると、カテゴリ・小項目の並び順と構成が最新バージョンにリセットされます。\n記録とスタッフ名は保持されます。よろしいですか？")) return;
   const icon = document.getElementById("refresh-icon");
   icon.classList.add("spin");
   setTimeout(() => icon.classList.remove("spin"), 500);
-  loadFromStorage();
+  // Reset categories and task order to default (latest code), keep records & staff
+  CATEGORIES = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
+  taskOrder = {};
+  undoStack = [];
+  syncUndoBtn();
+  rebuildCategoryColors();
+  saveToStorage();
   updateHeader();
   renderCurrentView();
 });
@@ -505,7 +594,7 @@ function renderTimerView() {
   const el = document.getElementById("view-timer");
   let html = "";
   CATEGORIES.forEach(cat => {
-    const isOpen = openCat === cat.name;
+    const isOpen = openCats.has(cat.name);
     html += `<div style="margin-bottom:11px">
       <button class="cat-header${isOpen?" open":""}" style="background:${cat.color}" data-cat="${cat.name}">
         <span class="cat-header-name">${cat.name}</span>
@@ -538,7 +627,9 @@ function renderTimerView() {
  
   el.querySelectorAll(".cat-header").forEach(btn => {
     btn.addEventListener("click", () => {
-      openCat = openCat === btn.dataset.cat ? null : btn.dataset.cat;
+      const name = btn.dataset.cat;
+      if (openCats.has(name)) openCats.delete(name);
+      else openCats.add(name);
       renderTimerView();
     });
   });
@@ -607,41 +698,77 @@ function renderTimerView() {
   if (stopBtn) stopBtn.addEventListener("click", stopTask);
 }
  
-// ===== CROSS-CATEGORY MOVE =====
+// ===== UNDO HISTORY =====
+let undoStack = []; // stores snapshots of { CATEGORIES, taskOrder }
+function syncUndoBtn() {
+  const btn = document.getElementById("undo-btn");
+  if (btn) btn.style.display = undoStack.length ? "" : "none";
+}
+function pushUndo() {
+  undoStack.push({
+    cats: JSON.parse(JSON.stringify(CATEGORIES)),
+    order: JSON.parse(JSON.stringify(taskOrder)),
+  });
+  if (undoStack.length > 20) undoStack.shift();
+  syncUndoBtn();
+}
+function undo() {
+  if (!undoStack.length) return;
+  const snap = undoStack.pop();
+  CATEGORIES = snap.cats;
+  taskOrder = snap.order;
+  rebuildCategoryColors();
+  saveToStorage();
+  syncUndoBtn();
+  renderTimerView();
+}
+ 
+// ===== CROSS-CATEGORY MOVE (or same-cat reorder) =====
 function moveCrossCategory(srcId, srcCatName, targetCatName, targetId) {
-  const srcCat = CATEGORIES.find(c => c.name === srcCatName);
+  // Find the actual current cat for this task (may differ from srcCatName after prior moves)
+  let srcCat = CATEGORIES.find(c => c.tasks.some(t => t.id === srcId));
+  if (!srcCat) srcCat = CATEGORIES.find(c => c.name === srcCatName);
   const targetCat = CATEGORIES.find(c => c.name === targetCatName);
   if (!srcCat || !targetCat) return;
  
-  // Get ordered lists for both cats
-  const srcOrdered = getOrderedTasks(srcCat).map(t => t.id);
-  const tgtOrdered = getOrderedTasks(targetCat).map(t => t.id);
+  const isSameCat = srcCat.name === targetCatName;
  
-  // Remove from source
-  const fromIdx = srcOrdered.indexOf(srcId);
-  if (fromIdx === -1) return;
-  srcOrdered.splice(fromIdx, 1);
+  pushUndo();
  
-  // Add to target
-  if (targetId) {
-    const toIdx = tgtOrdered.indexOf(targetId);
-    if (toIdx !== -1) tgtOrdered.splice(toIdx, 0, srcId);
-    else tgtOrdered.push(srcId);
+  if (isSameCat) {
+    // Simple reorder within same category
+    const ordered = getOrderedTasks(srcCat).map(t => t.id);
+    const fromIdx = ordered.indexOf(srcId);
+    const toIdx = targetId ? ordered.indexOf(targetId) : ordered.length - 1;
+    if (fromIdx === -1 || toIdx === -1 || fromIdx === toIdx) { undoStack.pop(); return; }
+    ordered.splice(fromIdx, 1);
+    ordered.splice(toIdx, 0, srcId);
+    taskOrder[srcCat.name] = ordered;
   } else {
-    tgtOrdered.push(srcId);
-  }
- 
-  // If moving to a different cat, also update the task's home category data
-  if (srcCatName !== targetCatName) {
+    // Cross-category move: remove task from srcCat, add to targetCat
     const taskIdx = srcCat.tasks.findIndex(t => t.id === srcId);
-    if (taskIdx !== -1) {
-      const [task] = srcCat.tasks.splice(taskIdx, 1);
-      targetCat.tasks.push(task);
+    if (taskIdx === -1) { undoStack.pop(); return; }
+    const [task] = srcCat.tasks.splice(taskIdx, 1);
+    targetCat.tasks.push(task);
+ 
+    // Update taskOrder: remove from src order
+    const srcOrder = (taskOrder[srcCat.name] || srcCat.tasks.map(t => t.id)).filter(id => id !== srcId);
+    taskOrder[srcCat.name] = srcOrder;
+ 
+    // Add to target order at correct position
+    const tgtOrder = taskOrder[targetCat.name] || targetCat.tasks.map(t => t.id);
+    // Remove srcId if accidentally already there (safety)
+    const cleanTgt = tgtOrder.filter(id => id !== srcId);
+    if (targetId) {
+      const toIdx = cleanTgt.indexOf(targetId);
+      if (toIdx !== -1) cleanTgt.splice(toIdx, 0, srcId);
+      else cleanTgt.push(srcId);
+    } else {
+      cleanTgt.push(srcId);
     }
+    taskOrder[targetCat.name] = cleanTgt;
   }
  
-  taskOrder[srcCatName] = srcOrdered;
-  taskOrder[targetCatName] = tgtOrdered;
   rebuildCategoryColors();
   saveToStorage();
   renderTimerView();
@@ -747,7 +874,7 @@ function deleteCategory(idx) {
   }
   CATEGORIES.splice(idx, 1);
   delete taskOrder[cat.name];
-  if (openCat === cat.name) openCat = CATEGORIES[0]?.name || null;
+  if (openCats.has(cat.name)) { openCats.delete(cat.name); }
   rebuildCategoryColors();
   saveToStorage();
   renderEpCatList();
