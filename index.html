@@ -933,6 +933,41 @@ function renderTimerView() {
     });
   });
  
+  // Mouse drag: auto-open cat-header / subcat-header on hover during drag
+  let mouseAutoOpenTimer = null, mouseLastHovered = null;
+  function clearMouseAutoOpen() {
+    clearTimeout(mouseAutoOpenTimer); mouseAutoOpenTimer = null; mouseLastHovered = null;
+    el.querySelectorAll(".cat-header, .subcat-header").forEach(h => h.style.outline = "");
+  }
+  el.querySelectorAll(".cat-header").forEach(btn => {
+    btn.addEventListener("dragover", e => {
+      e.preventDefault();
+      const key = btn.dataset.cat;
+      if (key === mouseLastHovered) return;
+      clearMouseAutoOpen(); mouseLastHovered = key;
+      if (!openCats.has(key)) {
+        btn.style.outline = "2px dashed rgba(255,255,255,0.75)";
+        mouseAutoOpenTimer = setTimeout(() => { openCats.add(key); renderTimerView(); }, 650);
+      }
+    });
+    btn.addEventListener("dragleave", clearMouseAutoOpen);
+    btn.addEventListener("dragend",   clearMouseAutoOpen);
+  });
+  el.querySelectorAll(".subcat-header").forEach(btn => {
+    btn.addEventListener("dragover", e => {
+      e.preventDefault();
+      const key = btn.dataset.grp;
+      if (key === mouseLastHovered) return;
+      clearMouseAutoOpen(); mouseLastHovered = key;
+      if (!openCats.has(key)) {
+        btn.style.outline = "2px dashed rgba(255,255,255,0.75)";
+        mouseAutoOpenTimer = setTimeout(() => { openCats.add(key); renderTimerView(); }, 650);
+      }
+    });
+    btn.addEventListener("dragleave", clearMouseAutoOpen);
+    btn.addEventListener("dragend",   clearMouseAutoOpen);
+  });
+ 
   // Touch drag support
   setupTouchDrag(el);
  
@@ -1602,7 +1637,7 @@ function setupTouchDrag(container) {
     clearTimeout(autoOpenTimer);
     autoOpenTimer = null;
     lastHoveredCat = null;
-    container.querySelectorAll(".cat-header").forEach(h => h.style.outline = "");
+    container.querySelectorAll(".cat-header, .subcat-header").forEach(h => h.style.outline = "");
   }
  
   function startDrag(btn, touch) {
@@ -1676,30 +1711,25 @@ function setupTouchDrag(container) {
     const target = els.find(el => el.classList.contains("task-btn") && el !== dragBtn);
     if (target) target.classList.add("drag-over");
  
-    const catHeader = els.find(el => el.classList.contains("cat-header"));
+    // Auto-open: 中項目ヘッダー → 大項目ヘッダー の優先順位でチェック
     const subcatHeader = els.find(el => el.classList.contains("subcat-header"));
-    if (subcatHeader) {
-      const grpKey = subcatHeader.dataset.grp;
-      if (grpKey && grpKey !== lastHoveredCat) {
-        cancelAutoOpen();
-        lastHoveredCat = grpKey;
-        if (!openCats.has(grpKey)) {
-          subcatHeader.style.outline = "2px dashed rgba(255,255,255,0.6)";
-          autoOpenTimer = setTimeout(() => { openCats.add(grpKey); renderTimerView(); }, 700);
-        }
+    const catHeader    = els.find(el => el.classList.contains("cat-header"));
+    const hoverKey = subcatHeader ? subcatHeader.dataset.grp
+                   : catHeader    ? catHeader.dataset.cat
+                   : null;
+ 
+    if (hoverKey && hoverKey !== lastHoveredCat) {
+      cancelAutoOpen();
+      lastHoveredCat = hoverKey;
+      if (!openCats.has(hoverKey)) {
+        const headerEl = subcatHeader || catHeader;
+        headerEl.style.outline = "2px dashed rgba(255,255,255,0.75)";
+        autoOpenTimer = setTimeout(() => {
+          openCats.add(hoverKey);
+          renderTimerView();
+        }, 650);
       }
-    } else if (catHeader) {
-    } else if (catHeader) {
-      const catName = catHeader.dataset.cat;
-      if (catName !== lastHoveredCat) {
-        cancelAutoOpen();
-        lastHoveredCat = catName;
-        if (!openCats.has(catName)) {
-          catHeader.style.outline = "2px dashed rgba(255,255,255,0.6)";
-          autoOpenTimer = setTimeout(() => { openCats.add(catName); renderTimerView(); }, 700);
-        }
-      }
-    } else {
+    } else if (!hoverKey) {
       cancelAutoOpen();
     }
   }, { passive: false });
