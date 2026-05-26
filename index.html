@@ -64,8 +64,11 @@
     .cat-header-name { color: #fff; font-size: 13px; font-weight: 700; }
     .cat-header-count { color: rgba(255,255,255,0.7); font-size: 11px; }
     .task-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 7px; margin-bottom: 8px; }
-    .task-btn { border-radius: 12px; padding: 12px 6px 10px; text-align: center; border: 1.5px solid #E4E0DA; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.06); transition: all 0.15s; }
+    .task-btn { border-radius: 12px; padding: 12px 6px 10px; text-align: center; border: 1.5px solid #E4E0DA; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.06); transition: all 0.15s; cursor: grab; touch-action: none; }
     .task-btn.active { transform: scale(0.96); }
+    .task-btn.dragging { opacity: 0.4; cursor: grabbing; transform: scale(0.95); }
+    .task-btn.drag-over { border: 2px dashed #2B3F5C !important; background: #F0EDE8 !important; }
+    .drag-hint { font-size: 10px; color: #CCC; text-align: center; margin-bottom: 4px; letter-spacing: 0.5px; }
     .task-icon { font-size: 22px; margin-bottom: 4px; }
     .task-label { font-size: 11px; font-weight: 700; color: #2B3F5C; line-height: 1.3; }
     .task-label.active { color: #fff; }
@@ -77,15 +80,15 @@
     .timeline-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
     .timeline-scroll { overflow-y: auto; background: #fff; border-radius: 14px; border: 1px solid #E4E0DA; position: relative; }
     .timeline-inner { display: flex; }
-    .hour-labels { width: 44px; flex-shrink: 0; position: relative; }
+    .hour-labels { width: 50px; flex-shrink: 0; position: relative; }
     .hour-label { position: absolute; left: 0; right: 0; text-align: right; padding-right: 6px; font-size: 10px; color: #BBB; font-variant-numeric: tabular-nums; }
     .timeline-grid { flex: 1; position: relative; }
     .grid-line { position: absolute; left: 0; right: 0; }
     .current-time-line { position: absolute; left: 0; right: 0; border-top: 2px solid #E05555; z-index: 5; }
     .current-time-dot { position: absolute; left: -2px; top: -4px; width: 8px; height: 8px; border-radius: 50%; background: #E05555; }
-    .task-block { position: absolute; border-radius: 5px; padding: 2px 3px; overflow: hidden; box-sizing: border-box; }
-    .task-block-name { font-size: 9px; color: #fff; font-weight: 700; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .task-block-time { font-size: 8px; color: rgba(255,255,255,0.85); }
+    .task-block { position: absolute; border-radius: 6px; padding: 3px 5px; overflow: hidden; box-sizing: border-box; cursor: default; }
+    .task-block-name { font-size: 10px; color: #fff; font-weight: 700; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .task-block-time { font-size: 9px; color: rgba(255,255,255,0.9); margin-top: 1px; }
     .legend { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; padding-bottom: 10px; }
     .legend-item { display: flex; align-items: center; gap: 4px; }
     .legend-dot { width: 10px; height: 10px; border-radius: 3px; }
@@ -172,14 +175,14 @@
 // ===== DATA =====
 const CATEGORIES = [
   { name:"身体介護", color:"#4A7FB5", tasks:[
-    {id:"排泄",label:"排泄",icon:"🚽"},{id:"移乗",label:"移乗",icon:"🔄"},
-    {id:"体位変換",label:"体位変換",icon:"↔️"},{id:"移動",label:"移動",icon:"🚶"},
-    {id:"一部排泄",label:"一部排泄",icon:"🚻"},{id:"入浴",label:"入浴",icon:"🛁"},
-    {id:"清拭",label:"清拭",icon:"🧼"},{id:"洗面",label:"洗面",icon:"🪥"},
-    {id:"着替え",label:"着替え",icon:"👕"},{id:"口腔ケア",label:"口腔ケア",icon:"🦷"},
-    {id:"問題対応",label:"問題対応",icon:"🆘"},{id:"食事",label:"食事",icon:"🍱"},
-    {id:"水分",label:"水分",icon:"💧"},{id:"機能訓練",label:"機能訓練",icon:"💪"},
-    {id:"医療処置",label:"医療処置",icon:"💉"},
+    {id:"排泄",label:"排泄介助",icon:"🚽"},{id:"移乗",label:"移乗介助",icon:"🔄"},
+    {id:"体位変換",label:"体位変換",icon:"↔️"},{id:"移動",label:"移動介助",icon:"🚶"},
+    {id:"一部排泄",label:"一部排泄",icon:"🚻"},{id:"入浴",label:"入浴介助",icon:"🛁"},
+    {id:"清拭",label:"清拭介助",icon:"🧼"},{id:"洗面",label:"整容介助",icon:"🪥"},
+    {id:"着替え",label:"更衣介助",icon:"👕"},{id:"口腔ケア",label:"環境整備",icon:"🏠"},
+    {id:"問題対応",label:"問題対応",icon:"🆘"},{id:"食事",label:"食事介助",icon:"🍱"},
+    {id:"水分",label:"コール対応",icon:"🔔"},{id:"機能訓練",label:"機能訓練",icon:"💪"},
+    {id:"医療処置",label:"バイタル測定",icon:"🩺"},
   ]},
   { name:"医療・対応", color:"#7EB87A", tasks:[
     {id:"診察対応",label:"診察対応",icon:"🩺"},{id:"与薬対応",label:"与薬対応",icon:"💊"},
@@ -201,9 +204,10 @@ const CATEGORIES = [
   ]},
 ];
 const CATEGORY_COLORS = {"身体介護":"#4A7FB5","医療・対応":"#7EB87A","間接業務":"#B8A87A","その他":"#C87A9B"};
-const PX_PER_MIN = 3;
+const PX_PER_MIN = 5;
 const KEY_STAFF = "careapp:staffName";
 const KEY_RECORDS = "careapp:records";
+const KEY_TASK_ORDER = "careapp:taskOrder";
  
 // ===== STATE =====
 let staffName = "";
@@ -216,6 +220,8 @@ let pulseState = false;
 let openCat = "身体介護";
 let currentView = "timer";
 let setupMode = "init";
+// taskOrder: { [catName]: [taskId, ...] }
+let taskOrder = {};
  
 // ===== UTILS =====
 function formatTime(ms) {
@@ -238,10 +244,21 @@ function todayStr() {
 function saveToStorage() {
   try { localStorage.setItem(KEY_STAFF, staffName); } catch(e){}
   try { localStorage.setItem(KEY_RECORDS, JSON.stringify(records)); } catch(e){}
+  try { localStorage.setItem(KEY_TASK_ORDER, JSON.stringify(taskOrder)); } catch(e){}
 }
 function loadFromStorage() {
   try { staffName = localStorage.getItem(KEY_STAFF) || ""; } catch(e){}
   try { const r = localStorage.getItem(KEY_RECORDS); if(r) records = JSON.parse(r); } catch(e){}
+  try { const o = localStorage.getItem(KEY_TASK_ORDER); if(o) taskOrder = JSON.parse(o); } catch(e){}
+}
+function getOrderedTasks(cat) {
+  const order = taskOrder[cat.name];
+  if (!order) return cat.tasks;
+  const taskMap = Object.fromEntries(cat.tasks.map(t=>[t.id,t]));
+  const ordered = order.map(id=>taskMap[id]).filter(Boolean);
+  // append any new tasks not in saved order
+  cat.tasks.forEach(t=>{ if(!order.includes(t.id)) ordered.push(t); });
+  return ordered;
 }
  
 // ===== MODAL =====
@@ -388,14 +405,16 @@ function renderTimerView() {
         <span class="cat-header-count">${isOpen?"▲":"▼"} ${cat.tasks.length}項目</span>
       </button>`;
     if (isOpen) {
-      html += `<div class="task-grid">`;
-      cat.tasks.forEach(task => {
+      const orderedTasks = getOrderedTasks(cat);
+      html += `<div class="drag-hint">☰ 長押しでドラッグして順序を変更</div>`;
+      html += `<div class="task-grid" data-cat="${cat.name}">`;
+      orderedTasks.forEach(task => {
         const isActive = activeTask && activeTask.id === task.id;
         const border = isActive ? `2px solid ${cat.color}` : "1.5px solid #E4E0DA";
         const bg = isActive ? cat.color : "#fff";
         const shadow = isActive ? `0 3px 14px ${cat.color}55` : "0 1px 3px rgba(0,0,0,0.06)";
         const scale = isActive ? "scale(0.96)" : "scale(1)";
-        html += `<button class="task-btn${isActive?" active":""}" style="background:${bg};border:${border};box-shadow:${shadow};transform:${scale}" data-task="${task.id}" data-cat="${cat.name}">
+        html += `<button class="task-btn${isActive?" active":""}" draggable="true" style="background:${bg};border:${border};box-shadow:${shadow};transform:${scale}" data-task="${task.id}" data-cat="${cat.name}">
           <div class="task-icon">${task.icon}</div>
           <div class="task-label${isActive?" active":""}">${task.label}</div>
           ${isActive ? `<div class="task-elapsed">${formatTime(elapsed)}</div>` : ""}
@@ -409,12 +428,15 @@ function renderTimerView() {
     html += `<button class="stop-btn" id="stop-btn">⏹ ${activeTask.label} を停止して記録する</button>`;
   }
   el.innerHTML = html;
+ 
   el.querySelectorAll(".cat-header").forEach(btn => {
     btn.addEventListener("click", () => {
       openCat = openCat === btn.dataset.cat ? null : btn.dataset.cat;
       renderTimerView();
     });
   });
+ 
+  // Task click
   el.querySelectorAll(".task-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       const catName = btn.dataset.cat;
@@ -426,8 +448,116 @@ function renderTimerView() {
       else startTask(taskInfo);
     });
   });
+ 
+  // Drag-and-drop for task reordering
+  let dragSrcId = null, dragSrcCat = null;
+  el.querySelectorAll(".task-btn").forEach(btn => {
+    btn.addEventListener("dragstart", e => {
+      dragSrcId = btn.dataset.task;
+      dragSrcCat = btn.dataset.cat;
+      btn.classList.add("dragging");
+      e.dataTransfer.effectAllowed = "move";
+    });
+    btn.addEventListener("dragend", () => { btn.classList.remove("dragging"); });
+    btn.addEventListener("dragover", e => { e.preventDefault(); btn.classList.add("drag-over"); });
+    btn.addEventListener("dragleave", () => btn.classList.remove("drag-over"));
+    btn.addEventListener("drop", e => {
+      e.preventDefault();
+      btn.classList.remove("drag-over");
+      const targetId = btn.dataset.task;
+      const targetCat = btn.dataset.cat;
+      if (dragSrcId === targetId || dragSrcCat !== targetCat) return;
+      const cat = CATEGORIES.find(c=>c.name===targetCat);
+      const ordered = getOrderedTasks(cat).map(t=>t.id);
+      const fromIdx = ordered.indexOf(dragSrcId);
+      const toIdx = ordered.indexOf(targetId);
+      if (fromIdx === -1 || toIdx === -1) return;
+      ordered.splice(fromIdx, 1);
+      ordered.splice(toIdx, 0, dragSrcId);
+      taskOrder[targetCat] = ordered;
+      saveToStorage();
+      renderTimerView();
+    });
+  });
+ 
+  // Touch drag support
+  setupTouchDrag(el);
+ 
   const stopBtn = el.querySelector(".stop-btn");
   if (stopBtn) stopBtn.addEventListener("click", stopTask);
+}
+ 
+// ===== TOUCH DRAG SUPPORT =====
+function setupTouchDrag(container) {
+  let dragEl = null, clone = null, startX = 0, startY = 0, offsetX = 0, offsetY = 0;
+  let dragSrcId = null, dragSrcCat = null;
+ 
+  container.querySelectorAll(".task-btn").forEach(btn => {
+    let longPressTimer = null;
+ 
+    btn.addEventListener("touchstart", e => {
+      longPressTimer = setTimeout(() => {
+        dragEl = btn;
+        dragSrcId = btn.dataset.task;
+        dragSrcCat = btn.dataset.cat;
+        const touch = e.touches[0];
+        const rect = btn.getBoundingClientRect();
+        offsetX = touch.clientX - rect.left;
+        offsetY = touch.clientY - rect.top;
+        clone = btn.cloneNode(true);
+        clone.style.cssText = `position:fixed;z-index:999;opacity:0.85;pointer-events:none;width:${rect.width}px;left:${rect.left}px;top:${rect.top}px;transition:none;box-shadow:0 8px 24px rgba(0,0,0,0.22);`;
+        document.body.appendChild(clone);
+        btn.style.opacity = "0.3";
+        navigator.vibrate && navigator.vibrate(30);
+      }, 400);
+    }, {passive:true});
+ 
+    btn.addEventListener("touchmove", e => {
+      if (!longPressTimer || !clone) { clearTimeout(longPressTimer); longPressTimer=null; return; }
+      e.preventDefault();
+      const touch = e.touches[0];
+      clone.style.left = (touch.clientX - offsetX) + "px";
+      clone.style.top = (touch.clientY - offsetY) + "px";
+ 
+      // highlight target
+      container.querySelectorAll(".task-btn").forEach(b => b.classList.remove("drag-over"));
+      const els = document.elementsFromPoint(touch.clientX, touch.clientY);
+      const target = els.find(el => el.classList.contains("task-btn") && el !== btn);
+      if (target) target.classList.add("drag-over");
+    }, {passive:false});
+ 
+    btn.addEventListener("touchend", e => {
+      clearTimeout(longPressTimer); longPressTimer=null;
+      if (!clone) return;
+      document.body.removeChild(clone); clone=null;
+      btn.style.opacity = "";
+      const touch = e.changedTouches[0];
+      container.querySelectorAll(".task-btn").forEach(b => b.classList.remove("drag-over"));
+      const els = document.elementsFromPoint(touch.clientX, touch.clientY);
+      const target = els.find(el => el.classList.contains("task-btn") && el !== btn);
+      if (target && target.dataset.cat === dragSrcCat && target.dataset.task !== dragSrcId) {
+        const cat = CATEGORIES.find(c=>c.name===dragSrcCat);
+        const ordered = getOrderedTasks(cat).map(t=>t.id);
+        const fromIdx = ordered.indexOf(dragSrcId);
+        const toIdx = ordered.indexOf(target.dataset.task);
+        if (fromIdx !== -1 && toIdx !== -1) {
+          ordered.splice(fromIdx, 1);
+          ordered.splice(toIdx, 0, dragSrcId);
+          taskOrder[dragSrcCat] = ordered;
+          saveToStorage();
+          renderTimerView();
+        }
+      }
+      dragEl=null; dragSrcId=null; dragSrcCat=null;
+    });
+ 
+    btn.addEventListener("touchcancel", () => {
+      clearTimeout(longPressTimer);
+      if (clone) { document.body.removeChild(clone); clone=null; }
+      if (btn) btn.style.opacity = "";
+      dragEl=null;
+    });
+  });
 }
  
 // ===== TIMELINE =====
@@ -437,7 +567,9 @@ function buildTimelineColumns() {
   sorted.forEach(rec => {
     let placed = false;
     for (let i=0;i<cols.length;i++) {
-      if (cols[i][cols[i].length-1].endMs <= rec.startMs) { cols[i].push(rec); placed=true; break; }
+      const last = cols[i][cols[i].length-1];
+      // Add 1 minute buffer to prevent visual overlap
+      if (last.endMs + 60000 <= rec.startMs) { cols[i].push(rec); placed=true; break; }
     }
     if (!placed) cols.push([rec]);
   });
@@ -466,23 +598,27 @@ function renderTimeline() {
       const endMin = new Date(rec.endMs).getHours()*60+new Date(rec.endMs).getMinutes();
       const durMin = Math.max(endMin-startMin,1);
       const colW = 100/cols.length;
-      const h = Math.max(durMin*PX_PER_MIN-2,18);
+      const h = Math.max(durMin*PX_PER_MIN-2,20);
+      const showTime = durMin >= 3;
       blocksHtml += `<div class="task-block" title="${rec.staffName}: ${rec.label} (${rec.startStr}〜${rec.endStr})"
-        style="top:${startMin*PX_PER_MIN+1}px;height:${h}px;left:${ci*colW+0.5}%;width:${colW-1}%;background:${rec.categoryColor}CC;border:1px solid ${rec.categoryColor}">
+        style="top:${startMin*PX_PER_MIN+1}px;height:${h}px;left:${ci*colW+0.5}%;width:${colW-1}%;background:${rec.categoryColor}DD;border:1.5px solid ${rec.categoryColor}">
         <div class="task-block-name">${rec.icon} ${rec.label}</div>
-        ${durMin>=5?`<div class="task-block-time">${rec.startStr}〜${rec.endStr}</div>`:""}
+        ${showTime?`<div class="task-block-time">${rec.startStr}〜${rec.endStr}</div>`:""}
       </div>`;
     });
   });
  
   let gridHtml = "";
   for (let h=0;h<24;h++) {
-    gridHtml += `<div class="grid-line" style="top:${h*60*PX_PER_MIN}px;border-top:${h%6===0?"1.5px solid #D8D4CE":"1px solid #EDE9E4"}"></div>`;
+    gridHtml += `<div class="grid-line" style="top:${h*60*PX_PER_MIN}px;border-top:${h%6===0?"1.5px solid #C8C4BE":"1px solid #EDE9E4"}"></div>`;
+    // 30-min sub-line
+    gridHtml += `<div class="grid-line" style="top:${(h*60+30)*PX_PER_MIN}px;border-top:1px dashed #F0EDE8"></div>`;
   }
  
   let hourLabels = "";
   for (let h=0;h<24;h++) {
     hourLabels += `<div class="hour-label" style="top:${h*60*PX_PER_MIN-7}px">${String(h).padStart(2,"0")}:00</div>`;
+    hourLabels += `<div class="hour-label" style="top:${(h*60+30)*PX_PER_MIN-7}px;font-size:9px;color:#CCC">:30</div>`;
   }
  
   let legendHtml = Object.entries(CATEGORY_COLORS).map(([name,color])=>
