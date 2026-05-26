@@ -634,9 +634,12 @@ function renderTimerView() {
     });
   });
  
-  // Task click
+  // Task click (mouse only — touch is handled in setupTouchDrag)
   el.querySelectorAll(".task-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
+    btn.addEventListener("click", e => {
+      if (e.sourceCapabilities && !e.sourceCapabilities.firesTouchEvents === false) return;
+      // Skip if this came from a touch (touchend fires click too)
+      if (btn._touchHandled) { btn._touchHandled = false; return; }
       const catName = btn.dataset.cat;
       const taskId = btn.dataset.task;
       const cat = CATEGORIES.find(c=>c.name===catName);
@@ -967,64 +970,126 @@ function deleteTask(catName, tidx) {
  
 // ===== TOUCH DRAG SUPPORT =====
 function setupTouchDrag(container) {
-  let dragEl = null, clone = null, startX = 0, startY = 0, offsetX = 0, offsetY = 0;
-  let dragSrcId = null, dragSrcCat = null;
+  let clone = null, dragSrcId = null, dragSrcCat = null, dragBtn = null;
+  let offsetX = 0, offsetY = 0;
+  let autoOpenTimer = null, lastHoveredCat = null;
+ 
+  function cancelAutoOpen() {
+    clearTimeout(autoOpenTimer);
+    autoOpenTimer = null;
+    lastHoveredCat = null;
+    container.querySelectorAll(".cat-header").forEach(h => h.style.outline = "");
+  }
+ 
+  function startDrag(btn, touch) {
+    dragBtn = btn;
+    dragSrcId = btn.dataset.task;
+    dragSrcCat = btn.dataset.cat;
+    const rect = btn.getBoundingClientRect();
+    offsetX = touch.clientX - rect.left;
+    offsetY = touch.clientY - rect.top;
+    clone = btn.cloneNode(true);
+    clone.style.cssText = `position:fixed;z-index:999;opacity:0.88;pointer-events:none;width:${rect.width}px;left:${rect.left}px;top:${rect.top}px;transition:none;box-shadow:0 8px 28px rgba(0,0,0,0.28);transform:scale(1.06);`;
+    document.body.appendChild(clone);
+    btn.style.opacity = "0.3";
+    navigator.vibrate && navigator.vibrate(20);
+  }
+ 
+  function endDrag(touch) {
+    if (!clone) return;
+    document.body.removeChild(clone); clone = null;
+    if (dragBtn) dragBtn.style.opacity = "";
+    container.querySelectorAll(".task-btn").forEach(b => b.classList.remove("drag-over"));
+    cancelAutoOpen();
+ 
+    const els = document.elementsFromPoint(touch.clientX, touch.clientY);
+    const target = els.find(el => el.classList.contains("task-btn") && el !== dragBtn);
+    if (target && target.dataset.task !== dragSrcId) {
+      moveCrossCategory(dragSrcId, dragSrcCat, target.dataset.cat, target.dataset.task);
+    } else {
+      // Drop on task-grid (empty area of a category)
+      const grid = els.find(el => el.classList.contains("task-grid"));
+      if (grid && grid.dataset.cat && grid.dataset.cat !== dragSrcCat) {
+        moveCrossCategory(dragSrcId, dragSrcCat, grid.dataset.cat, null);
+      }
+    }
+    dragBtn = null; dragSrcId = null; dragSrcCat = null;
+  }
  
   container.querySelectorAll(".task-btn").forEach(btn => {
-    let longPressTimer = null;
+    let moved = false;
  
     btn.addEventListener("touchstart", e => {
-      longPressTimer = setTimeout(() => {
-        dragEl = btn;
-        dragSrcId = btn.dataset.task;
-        dragSrcCat = btn.dataset.cat;
-        const touch = e.touches[0];
-        const rect = btn.getBoundingClientRect();
-        offsetX = touch.clientX - rect.left;
-        offsetY = touch.clientY - rect.top;
-        clone = btn.cloneNode(true);
-        clone.style.cssText = `position:fixed;z-index:999;opacity:0.85;pointer-events:none;width:${rect.width}px;left:${rect.left}px;top:${rect.top}px;transition:none;box-shadow:0 8px 24px rgba(0,0,0,0.22);`;
-        document.body.appendChild(clone);
-        btn.style.opacity = "0.3";
-        navigator.vibrate && navigator.vibrate(30);
-      }, 400);
-    }, {passive:true});
+      moved = false;
+      const touch = e.touches[0];
+      startDrag(btn, touch);
+    }, { passive: true });
  
     btn.addEventListener("touchmove", e => {
-      if (!longPressTimer || !clone) { clearTimeout(longPressTimer); longPressTimer=null; return; }
+      if (!clone) return;
+      moved = true;
       e.preventDefault();
       const touch = e.touches[0];
       clone.style.left = (touch.clientX - offsetX) + "px";
-      clone.style.top = (touch.clientY - offsetY) + "px";
+      clone.style.top  = (touch.clientY - offsetY) + "px";
  
-      // highlight target
+      // Highlight target task-btn
       container.querySelectorAll(".task-btn").forEach(b => b.classList.remove("drag-over"));
       const els = document.elementsFromPoint(touch.clientX, touch.clientY);
       const target = els.find(el => el.classList.contains("task-btn") && el !== btn);
       if (target) target.classList.add("drag-over");
-    }, {passive:false});
+ 
+      // Auto-open closed category header on hover
+      const catHeader = els.find(el => el.classList.contains("cat-header"));
+      if (catHeader) {
+        const catName = catHeader.dataset.cat;
+        if (catName !== lastHoveredCat) {
+          cancelAutoOpen();
+          lastHoveredCat = catName;
+          if (!openCats.has(catName)) {
+            catHeader.style.outline = "2px dashed rgba(255,255,255,0.6)";
+            autoOpenTimer = setTimeout(() => {
+              openCats.add(catName);
+              renderTimerView();
+              // Re-attach touch handlers since renderTimerView rebuilds DOM
+            }, 700);
+          }
+        }
+      } else {
+        cancelAutoOpen();
+      }
+    }, { passive: false });
  
     btn.addEventListener("touchend", e => {
-      clearTimeout(longPressTimer); longPressTimer=null;
       if (!clone) return;
-      document.body.removeChild(clone); clone=null;
-      btn.style.opacity = "";
-      const touch = e.changedTouches[0];
-      container.querySelectorAll(".task-btn").forEach(b => b.classList.remove("drag-over"));
-      const els = document.elementsFromPoint(touch.clientX, touch.clientY);
-      const target = els.find(el => el.classList.contains("task-btn") && el !== btn);
-      if (target && target.dataset.task !== dragSrcId) {
-        const targetCat = target.dataset.cat;
-        moveCrossCategory(dragSrcId, dragSrcCat, targetCat, target.dataset.task);
+      if (!moved) {
+        // treat as tap — cancel drag and fire task start/stop
+        document.body.removeChild(clone); clone = null;
+        if (dragBtn) dragBtn.style.opacity = "";
+        cancelAutoOpen();
+        const savedId = dragSrcId, savedCat = dragSrcCat;
+        dragBtn = null; dragSrcId = null; dragSrcCat = null;
+        // manually trigger task logic
+        const cat = CATEGORIES.find(c => c.name === savedCat);
+        if (cat) {
+          const task = cat.tasks.find(t => t.id === savedId);
+          if (task) {
+            btn._touchHandled = true;
+            const taskInfo = {...task, categoryColor: cat.color, categoryName: cat.name};
+            if (activeTask && activeTask.id === savedId) stopTask();
+            else startTask(taskInfo);
+          }
+        }
+        return;
       }
-      dragEl=null; dragSrcId=null; dragSrcCat=null;
+      endDrag(e.changedTouches[0]);
     });
  
     btn.addEventListener("touchcancel", () => {
-      clearTimeout(longPressTimer);
-      if (clone) { document.body.removeChild(clone); clone=null; }
-      if (btn) btn.style.opacity = "";
-      dragEl=null;
+      if (clone) { document.body.removeChild(clone); clone = null; }
+      if (dragBtn) dragBtn.style.opacity = "";
+      cancelAutoOpen();
+      dragBtn = null; dragSrcId = null; dragSrcCat = null;
     });
   });
 }
