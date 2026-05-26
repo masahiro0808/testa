@@ -45,6 +45,10 @@
     .staff-badge span { color: #fff; font-size: 13px; font-weight: 600; }
     .staff-badge small { color: #7A9EC8; font-size: 10px; }
     .saving-label { color: #7A9EC8; font-size: 10px; }
+    .refresh-btn { display: flex; align-items: center; gap: 5px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.18); border-radius: 20px; padding: 5px 12px; color: #7A9EC8; font-size: 12px; }
+    .refresh-btn:active { background: rgba(255,255,255,0.22); }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spin { animation: spin 0.5s linear; }
     .active-task-bar { margin-top: 10px; background: rgba(78,219,168,0.12); border: 1.5px solid rgba(78,219,168,0.4); border-radius: 12px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
     .active-task-left { display: flex; align-items: center; gap: 9px; }
     .pulse-dot { width: 8px; height: 8px; border-radius: 50%; background: #4EDBA8; transition: all 0.5s; }
@@ -115,6 +119,43 @@
     .reset-btn { width: 100%; padding: 11px; margin-top: 8px; background: none; border: 1.5px solid #E4E0DA; border-radius: 10px; color: #BBB; font-size: 12px; }
  
     .hidden { display: none !important; }
+ 
+    /* Edit panel overlay */
+    .edit-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.55); display: flex; align-items: flex-end; justify-content: center; z-index: 200; }
+    .edit-panel { background: #fff; border-radius: 24px 24px 0 0; padding: 24px 20px 36px; width: 100%; max-width: 430px; max-height: 85vh; overflow-y: auto; }
+    .edit-panel-handle { width: 40px; height: 4px; background: #DDD; border-radius: 4px; margin: 0 auto 18px; }
+    .edit-panel-title { font-size: 16px; font-weight: 700; color: #2B3F5C; margin-bottom: 4px; }
+    .edit-panel-sub { font-size: 12px; color: #AAA; margin-bottom: 18px; }
+    .edit-section-label { font-size: 11px; color: #AAA; letter-spacing: 1px; margin: 14px 0 8px; }
+    .edit-row { display: flex; gap: 8px; margin-bottom: 8px; }
+    .edit-input { flex: 1; padding: 11px 13px; border: 2px solid #D0CCC8; border-radius: 10px; font-size: 14px; font-family: inherit; outline: none; }
+    .edit-input:focus { border-color: #2B3F5C; }
+    .edit-input-sm { width: 64px; padding: 11px 8px; border: 2px solid #D0CCC8; border-radius: 10px; font-size: 18px; text-align: center; font-family: inherit; outline: none; flex-shrink: 0; }
+    .edit-input-sm:focus { border-color: #2B3F5C; }
+    .edit-add-btn { padding: 11px 16px; background: #2B3F5C; border: none; border-radius: 10px; color: #fff; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+    .edit-cat-item { display: flex; align-items: center; gap: 8px; padding: 9px 10px; background: #F8F7F5; border-radius: 10px; margin-bottom: 6px; border: 1.5px solid #EAE6E0; }
+    .edit-cat-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+    .edit-cat-name { flex: 1; font-size: 13px; font-weight: 600; color: #2B3F5C; }
+    .edit-icon-btn { width: 32px; height: 32px; border: none; border-radius: 8px; font-size: 15px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+    .edit-task-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: #F8F7F5; border-radius: 10px; margin-bottom: 5px; border: 1.5px solid #EAE6E0; }
+    .edit-task-icon { font-size: 18px; flex-shrink: 0; width: 28px; text-align: center; }
+    .edit-task-name { flex: 1; font-size: 12px; font-weight: 600; color: #2B3F5C; }
+    .edit-task-cat { font-size: 10px; color: #AAA; flex-shrink: 0; }
+    .edit-cat-selector { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+    .edit-cat-pill { padding: 5px 12px; border-radius: 20px; border: 2px solid transparent; font-size: 11px; font-weight: 700; background: #F0EDE8; color: #888; cursor: pointer; }
+    .edit-cat-pill.selected { color: #fff; }
+    .edit-btn-row { display: flex; gap: 8px; margin-top: 14px; }
+    .edit-close-btn { flex: 1; padding: 13px; background: #F0EDE8; border: none; border-radius: 12px; color: #888; font-size: 14px; font-weight: 700; }
+    .edit-manage-btn { display: flex; align-items: center; gap: 5px; padding: 5px 12px; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; color: #7A9EC8; font-size: 11px; font-weight: 600; cursor: pointer; }
+    .cat-header-right { display: flex; align-items: center; gap: 8px; }
+ 
+    /* Cross-category drag highlight */
+    .task-grid.drag-target { background: rgba(43,63,92,0.06); border-radius: 10px; min-height: 60px; }
+    .task-grid.drag-target-over { background: rgba(43,63,92,0.1); outline: 2px dashed #2B3F5C; outline-offset: 2px; }
+    .cat-section.drop-zone-open { outline: 2px dashed #4EDBA8; outline-offset: 4px; border-radius: 14px; }
+    .color-picker-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+    .color-swatch { width: 28px; height: 28px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; transition: transform 0.1s; }
+    .color-swatch.selected { border-color: #2B3F5C; transform: scale(1.15); }
   </style>
 </head>
 <body>
@@ -148,6 +189,8 @@
         <small>▼</small>
       </button>
       <span class="saving-label hidden" id="saving-label">保存中...</span>
+      <button class="edit-manage-btn" onclick="openEditPanel()">⚙️ 項目管理</button>
+      <button class="refresh-btn" id="refresh-btn"><span id="refresh-icon">🔄</span> 更新</button>
     </div>
     <div class="active-task-bar hidden" id="active-task-bar">
       <div class="active-task-left">
@@ -169,31 +212,74 @@
   <div id="view-timer" class="timer-view"></div>
   <div id="view-timeline" class="timeline-view hidden"></div>
   <div id="view-history" class="history-view hidden"></div>
+ 
+  <!-- Edit Panel -->
+  <div class="edit-overlay hidden" id="edit-panel-overlay">
+    <div class="edit-panel" id="edit-panel">
+      <div class="edit-panel-handle"></div>
+      <div class="edit-panel-title" id="ep-title">カテゴリ・項目の管理</div>
+      <div class="edit-panel-sub" id="ep-sub">大項目・小項目の追加・編集・削除</div>
+ 
+      <!-- Tab inside panel -->
+      <div style="display:flex;gap:6px;margin-bottom:14px">
+        <button class="edit-cat-pill selected" id="ep-tab-cat" style="background:#2B3F5C;color:#fff;flex:1;text-align:center" onclick="switchEpTab('cat')">📁 大項目</button>
+        <button class="edit-cat-pill" id="ep-tab-task" style="flex:1;text-align:center" onclick="switchEpTab('task')">📌 小項目</button>
+      </div>
+ 
+      <!-- Category management -->
+      <div id="ep-cat-section">
+        <div class="edit-section-label">大項目を追加</div>
+        <div class="edit-row">
+          <input class="edit-input" id="ep-new-cat-name" placeholder="大項目名" />
+          <button class="edit-add-btn" onclick="addCategory()">追加</button>
+        </div>
+        <div class="color-picker-row" id="ep-color-picker"></div>
+        <div class="edit-section-label">大項目一覧</div>
+        <div id="ep-cat-list"></div>
+      </div>
+ 
+      <!-- Task management -->
+      <div id="ep-task-section" class="hidden">
+        <div class="edit-section-label">小項目を追加</div>
+        <div class="edit-row">
+          <input class="edit-input-sm" id="ep-new-task-icon" placeholder="🔧" maxlength="2" />
+          <input class="edit-input" id="ep-new-task-name" placeholder="業務名" />
+          <button class="edit-add-btn" onclick="addTask()">追加</button>
+        </div>
+        <div class="edit-section-label">追加先カテゴリ</div>
+        <div class="edit-cat-selector" id="ep-cat-pills"></div>
+        <div class="edit-section-label">小項目一覧</div>
+        <div id="ep-task-list"></div>
+      </div>
+ 
+      <button class="edit-close-btn" style="width:100%;margin-top:16px" onclick="closeEditPanel()">閉じる</button>
+    </div>
+  </div>
 </div>
  
 <script>
 // ===== DATA =====
-const CATEGORIES = [
+const DEFAULT_CATEGORIES = [
   { name:"身体介護", color:"#4A7FB5", tasks:[
     {id:"排泄",label:"排泄介助",icon:"🚽"},{id:"移乗",label:"移乗介助",icon:"🔄"},
     {id:"体位変換",label:"体位変換",icon:"↔️"},{id:"移動",label:"移動介助",icon:"🚶"},
-    {id:"一部排泄",label:"一部排泄",icon:"🚻"},{id:"入浴",label:"入浴介助",icon:"🛁"},
+    {id:"一部排泄",label:"排泄介助",icon:"🚻"},{id:"入浴",label:"入浴介助",icon:"🛁"},
     {id:"清拭",label:"清拭介助",icon:"🧼"},{id:"洗面",label:"整容介助",icon:"🪥"},
     {id:"着替え",label:"更衣介助",icon:"👕"},{id:"口腔ケア",label:"環境整備",icon:"🏠"},
     {id:"問題対応",label:"問題対応",icon:"🆘"},{id:"食事",label:"食事介助",icon:"🍱"},
     {id:"水分",label:"コール対応",icon:"🔔"},{id:"機能訓練",label:"機能訓練",icon:"💪"},
     {id:"医療処置",label:"バイタル測定",icon:"🩺"},
   ]},
-  { name:"医療・対応", color:"#7EB87A", tasks:[
+  { name:"看護師", color:"#7EB87A", tasks:[
     {id:"診察対応",label:"診察対応",icon:"🩺"},{id:"与薬対応",label:"与薬対応",icon:"💊"},
     {id:"他直接",label:"他直接",icon:"🤝"},{id:"巡回移動",label:"巡回移動",icon:"🔁"},
     {id:"記録",label:"記録",icon:"📋"},
   ]},
   { name:"間接業務", color:"#B8A87A", tasks:[
-    {id:"連絡調整",label:"連絡調整",icon:"📞"},{id:"アセス",label:"アセス",icon:"📝"},
-    {id:"計画",label:"計画",icon:"📅"},{id:"見守準備",label:"見守準備",icon:"👁"},
-    {id:"準備充電",label:"準備充電",icon:"🔋"},{id:"教育指導",label:"教育指導",icon:"📚"},
-    {id:"配薬下膳",label:"配薬下膳",icon:"🍽"},{id:"入浴準備",label:"入浴準備",icon:"🪣"},
+    {id:"連絡調整",label:"連絡調整",icon:"📞"},{id:"アセス",label:"アセスメント",icon:"📝"},
+    {id:"計画",label:"計画",icon:"📅"},{id:"見守準備",label:"見守り",icon:"👁"},
+    {id:"準備充電",label:"会議準備",icon:"📋"},{id:"教育指導",label:"教育指導",icon:"📚"},
+    {id:"配薬下膳",label:"調理配膳下膳",icon:"🍽"},{id:"入浴準備",label:"入浴準備",icon:"🪣"},
     {id:"リネン",label:"リネン",icon:"🛏"},{id:"居室清掃",label:"居室清掃",icon:"🧹"},
   ]},
   { name:"その他", color:"#C87A9B", tasks:[
@@ -203,11 +289,18 @@ const CATEGORIES = [
     {id:"余暇時間",label:"余暇時間(FREE)",icon:"🕐"},
   ]},
 ];
-const CATEGORY_COLORS = {"身体介護":"#4A7FB5","医療・対応":"#7EB87A","間接業務":"#B8A87A","その他":"#C87A9B"};
+let CATEGORIES = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
+let CATEGORY_COLORS = {};
+function rebuildCategoryColors() {
+  CATEGORY_COLORS = {};
+  CATEGORIES.forEach(c => { CATEGORY_COLORS[c.name] = c.color; });
+}
+rebuildCategoryColors();
 const PX_PER_MIN = 5;
 const KEY_STAFF = "careapp:staffName";
 const KEY_RECORDS = "careapp:records";
 const KEY_TASK_ORDER = "careapp:taskOrder";
+const KEY_CATEGORIES = "careapp:categories";
  
 // ===== STATE =====
 let staffName = "";
@@ -245,19 +338,24 @@ function saveToStorage() {
   try { localStorage.setItem(KEY_STAFF, staffName); } catch(e){}
   try { localStorage.setItem(KEY_RECORDS, JSON.stringify(records)); } catch(e){}
   try { localStorage.setItem(KEY_TASK_ORDER, JSON.stringify(taskOrder)); } catch(e){}
+  try { localStorage.setItem(KEY_CATEGORIES, JSON.stringify(CATEGORIES)); } catch(e){}
 }
 function loadFromStorage() {
   try { staffName = localStorage.getItem(KEY_STAFF) || ""; } catch(e){}
   try { const r = localStorage.getItem(KEY_RECORDS); if(r) records = JSON.parse(r); } catch(e){}
   try { const o = localStorage.getItem(KEY_TASK_ORDER); if(o) taskOrder = JSON.parse(o); } catch(e){}
+  try { const c = localStorage.getItem(KEY_CATEGORIES); if(c) CATEGORIES = JSON.parse(c); } catch(e){}
+  rebuildCategoryColors();
 }
 function getOrderedTasks(cat) {
   const order = taskOrder[cat.name];
+  // Build a map of all tasks across all categories for cross-cat lookup
+  const allTaskMap = {};
+  CATEGORIES.forEach(c => c.tasks.forEach(t => { allTaskMap[t.id] = t; }));
   if (!order) return cat.tasks;
-  const taskMap = Object.fromEntries(cat.tasks.map(t=>[t.id,t]));
-  const ordered = order.map(id=>taskMap[id]).filter(Boolean);
-  // append any new tasks not in saved order
-  cat.tasks.forEach(t=>{ if(!order.includes(t.id)) ordered.push(t); });
+  const ordered = order.map(id => allTaskMap[id]).filter(Boolean);
+  // append any tasks in this cat's definition not already in order
+  cat.tasks.forEach(t => { if (!order.includes(t.id)) ordered.push(t); });
   return ordered;
 }
  
@@ -309,6 +407,15 @@ function updateHeader() {
   const totalMs = records.reduce((s,r)=>s+r.duration,0);
   document.getElementById("total-display").textContent = totalMs > 0 ? formatDuration(totalMs) : "—";
 }
+ 
+document.getElementById("refresh-btn").addEventListener("click", () => {
+  const icon = document.getElementById("refresh-icon");
+  icon.classList.add("spin");
+  setTimeout(() => icon.classList.remove("spin"), 500);
+  loadFromStorage();
+  updateHeader();
+  renderCurrentView();
+});
  
 // ===== TIMER =====
 function startTask(task) {
@@ -407,7 +514,7 @@ function renderTimerView() {
     if (isOpen) {
       const orderedTasks = getOrderedTasks(cat);
       html += `<div class="drag-hint">☰ 長押しでドラッグして順序を変更</div>`;
-      html += `<div class="task-grid" data-cat="${cat.name}">`;
+      html += `<div class="task-grid drag-target" data-cat="${cat.name}">`;
       orderedTasks.forEach(task => {
         const isActive = activeTask && activeTask.id === task.id;
         const border = isActive ? `2px solid ${cat.color}` : "1.5px solid #E4E0DA";
@@ -449,7 +556,7 @@ function renderTimerView() {
     });
   });
  
-  // Drag-and-drop for task reordering
+  // Drag-and-drop for task reordering (including cross-category)
   let dragSrcId = null, dragSrcCat = null;
   el.querySelectorAll(".task-btn").forEach(btn => {
     btn.addEventListener("dragstart", e => {
@@ -457,8 +564,12 @@ function renderTimerView() {
       dragSrcCat = btn.dataset.cat;
       btn.classList.add("dragging");
       e.dataTransfer.effectAllowed = "move";
+      e.dataTransfer.setData("text/plain", dragSrcId + "|" + dragSrcCat);
     });
-    btn.addEventListener("dragend", () => { btn.classList.remove("dragging"); });
+    btn.addEventListener("dragend", () => {
+      btn.classList.remove("dragging");
+      el.querySelectorAll(".task-grid").forEach(g => g.classList.remove("drag-target-over"));
+    });
     btn.addEventListener("dragover", e => { e.preventDefault(); btn.classList.add("drag-over"); });
     btn.addEventListener("dragleave", () => btn.classList.remove("drag-over"));
     btn.addEventListener("drop", e => {
@@ -466,17 +577,26 @@ function renderTimerView() {
       btn.classList.remove("drag-over");
       const targetId = btn.dataset.task;
       const targetCat = btn.dataset.cat;
-      if (dragSrcId === targetId || dragSrcCat !== targetCat) return;
-      const cat = CATEGORIES.find(c=>c.name===targetCat);
-      const ordered = getOrderedTasks(cat).map(t=>t.id);
-      const fromIdx = ordered.indexOf(dragSrcId);
-      const toIdx = ordered.indexOf(targetId);
-      if (fromIdx === -1 || toIdx === -1) return;
-      ordered.splice(fromIdx, 1);
-      ordered.splice(toIdx, 0, dragSrcId);
-      taskOrder[targetCat] = ordered;
-      saveToStorage();
-      renderTimerView();
+      if (dragSrcId === targetId) return;
+      moveCrossCategory(dragSrcId, dragSrcCat, targetCat, targetId);
+    });
+  });
+ 
+  // Allow dropping onto empty task-grid area (cross-category into empty/end)
+  el.querySelectorAll(".task-grid").forEach(grid => {
+    grid.addEventListener("dragover", e => {
+      e.preventDefault();
+      grid.classList.add("drag-target-over");
+    });
+    grid.addEventListener("dragleave", e => {
+      if (!grid.contains(e.relatedTarget)) grid.classList.remove("drag-target-over");
+    });
+    grid.addEventListener("drop", e => {
+      e.preventDefault();
+      grid.classList.remove("drag-target-over");
+      const targetCat = grid.dataset.cat;
+      if (!dragSrcId || dragSrcCat === targetCat) return;
+      moveCrossCategory(dragSrcId, dragSrcCat, targetCat, null);
     });
   });
  
@@ -485,6 +605,237 @@ function renderTimerView() {
  
   const stopBtn = el.querySelector(".stop-btn");
   if (stopBtn) stopBtn.addEventListener("click", stopTask);
+}
+ 
+// ===== CROSS-CATEGORY MOVE =====
+function moveCrossCategory(srcId, srcCatName, targetCatName, targetId) {
+  const srcCat = CATEGORIES.find(c => c.name === srcCatName);
+  const targetCat = CATEGORIES.find(c => c.name === targetCatName);
+  if (!srcCat || !targetCat) return;
+ 
+  // Get ordered lists for both cats
+  const srcOrdered = getOrderedTasks(srcCat).map(t => t.id);
+  const tgtOrdered = getOrderedTasks(targetCat).map(t => t.id);
+ 
+  // Remove from source
+  const fromIdx = srcOrdered.indexOf(srcId);
+  if (fromIdx === -1) return;
+  srcOrdered.splice(fromIdx, 1);
+ 
+  // Add to target
+  if (targetId) {
+    const toIdx = tgtOrdered.indexOf(targetId);
+    if (toIdx !== -1) tgtOrdered.splice(toIdx, 0, srcId);
+    else tgtOrdered.push(srcId);
+  } else {
+    tgtOrdered.push(srcId);
+  }
+ 
+  // If moving to a different cat, also update the task's home category data
+  if (srcCatName !== targetCatName) {
+    const taskIdx = srcCat.tasks.findIndex(t => t.id === srcId);
+    if (taskIdx !== -1) {
+      const [task] = srcCat.tasks.splice(taskIdx, 1);
+      targetCat.tasks.push(task);
+    }
+  }
+ 
+  taskOrder[srcCatName] = srcOrdered;
+  taskOrder[targetCatName] = tgtOrdered;
+  rebuildCategoryColors();
+  saveToStorage();
+  renderTimerView();
+}
+ 
+// ===== EDIT PANEL =====
+const PRESET_COLORS = ["#4A7FB5","#7EB87A","#B8A87A","#C87A9B","#E07B5A","#7A9EC8","#9B7AB8","#5ABAA8","#C8A84A","#888888"];
+let epSelectedColor = "#4A7FB5";
+let epSelectedCatForTask = null;
+let currentEpTab = "cat";
+ 
+function openEditPanel() {
+  document.getElementById("edit-panel-overlay").classList.remove("hidden");
+  renderEpColorPicker();
+  renderEpCatList();
+  renderEpCatPills();
+  renderEpTaskList();
+}
+function closeEditPanel() {
+  document.getElementById("edit-panel-overlay").classList.add("hidden");
+}
+document.getElementById("edit-panel-overlay").addEventListener("click", function(e) {
+  if (e.target === this) closeEditPanel();
+});
+ 
+function switchEpTab(tab) {
+  currentEpTab = tab;
+  document.getElementById("ep-cat-section").classList.toggle("hidden", tab !== "cat");
+  document.getElementById("ep-task-section").classList.toggle("hidden", tab !== "task");
+  const catBtn = document.getElementById("ep-tab-cat");
+  const taskBtn = document.getElementById("ep-tab-task");
+  catBtn.classList.toggle("selected", tab === "cat");
+  taskBtn.classList.toggle("selected", tab === "task");
+  catBtn.style.background = tab === "cat" ? "#2B3F5C" : "#F0EDE8";
+  catBtn.style.color = tab === "cat" ? "#fff" : "#888";
+  taskBtn.style.background = tab === "task" ? "#2B3F5C" : "#F0EDE8";
+  taskBtn.style.color = tab === "task" ? "#fff" : "#888";
+  if (tab === "task") { renderEpCatPills(); renderEpTaskList(); }
+}
+ 
+function renderEpColorPicker() {
+  const el = document.getElementById("ep-color-picker");
+  el.innerHTML = PRESET_COLORS.map(c =>
+    `<div class="color-swatch${c === epSelectedColor ? " selected" : ""}" style="background:${c}" onclick="selectEpColor('${c}')"></div>`
+  ).join("");
+}
+function selectEpColor(color) {
+  epSelectedColor = color;
+  renderEpColorPicker();
+}
+ 
+function renderEpCatList() {
+  const el = document.getElementById("ep-cat-list");
+  el.innerHTML = CATEGORIES.map((cat, idx) => `
+    <div class="edit-cat-item">
+      <div class="edit-cat-dot" style="background:${cat.color}"></div>
+      <span class="edit-cat-name">${cat.name}</span>
+      <span style="font-size:10px;color:#AAA">${cat.tasks.length}項目</span>
+      <button class="edit-icon-btn" style="background:#F0EDE8;color:#555" onclick="editCategory(${idx})" title="編集">✏️</button>
+      <button class="edit-icon-btn" style="background:#FEE;color:#E05555" onclick="deleteCategory(${idx})" title="削除">🗑</button>
+    </div>`).join("");
+}
+ 
+function addCategory() {
+  const nameEl = document.getElementById("ep-new-cat-name");
+  const name = nameEl.value.trim();
+  if (!name) { nameEl.focus(); return; }
+  if (CATEGORIES.find(c => c.name === name)) { alert("同じ名前の大項目が既に存在します"); return; }
+  CATEGORIES.push({ name, color: epSelectedColor, tasks: [] });
+  rebuildCategoryColors();
+  saveToStorage();
+  nameEl.value = "";
+  renderEpCatList();
+  renderEpCatPills();
+  renderTimerView();
+}
+ 
+function editCategory(idx) {
+  const cat = CATEGORIES[idx];
+  const newName = prompt("大項目名を編集", cat.name);
+  if (!newName || newName.trim() === cat.name) return;
+  const trimmed = newName.trim();
+  if (CATEGORIES.find((c,i) => i !== idx && c.name === trimmed)) { alert("同じ名前が既に存在します"); return; }
+  // Update taskOrder keys
+  if (taskOrder[cat.name]) {
+    taskOrder[trimmed] = taskOrder[cat.name];
+    delete taskOrder[cat.name];
+  }
+  cat.name = trimmed;
+  rebuildCategoryColors();
+  saveToStorage();
+  renderEpCatList();
+  renderEpCatPills();
+  renderTimerView();
+}
+ 
+function deleteCategory(idx) {
+  const cat = CATEGORIES[idx];
+  if (cat.tasks.length > 0) {
+    if (!confirm(`「${cat.name}」には${cat.tasks.length}個の小項目があります。\n削除すると小項目もすべて削除されます。よろしいですか？`)) return;
+  } else {
+    if (!confirm(`「${cat.name}」を削除しますか？`)) return;
+  }
+  CATEGORIES.splice(idx, 1);
+  delete taskOrder[cat.name];
+  if (openCat === cat.name) openCat = CATEGORIES[0]?.name || null;
+  rebuildCategoryColors();
+  saveToStorage();
+  renderEpCatList();
+  renderEpCatPills();
+  renderEpTaskList();
+  renderTimerView();
+}
+ 
+function renderEpCatPills() {
+  const el = document.getElementById("ep-cat-pills");
+  if (!epSelectedCatForTask) epSelectedCatForTask = CATEGORIES[0]?.name || null;
+  el.innerHTML = CATEGORIES.map(cat =>
+    `<div class="edit-cat-pill${epSelectedCatForTask === cat.name ? " selected" : ""}"
+      style="${epSelectedCatForTask === cat.name ? `background:${cat.color};border-color:${cat.color};` : ""}"
+      onclick="selectEpCat('${cat.name}')">${cat.name}</div>`
+  ).join("");
+}
+function selectEpCat(name) {
+  epSelectedCatForTask = name;
+  renderEpCatPills();
+  renderEpTaskList();
+}
+ 
+function renderEpTaskList() {
+  const el = document.getElementById("ep-task-list");
+  // Show all tasks grouped
+  let html = "";
+  CATEGORIES.forEach(cat => {
+    if (!epSelectedCatForTask || epSelectedCatForTask === cat.name) {
+      cat.tasks.forEach((task, tidx) => {
+        html += `<div class="edit-task-item">
+          <span class="edit-task-icon">${task.icon}</span>
+          <span class="edit-task-name">${task.label}</span>
+          <span class="edit-task-cat" style="color:${cat.color}">${cat.name}</span>
+          <button class="edit-icon-btn" style="background:#F0EDE8;color:#555" onclick="editTask('${cat.name}',${tidx})" title="編集">✏️</button>
+          <button class="edit-icon-btn" style="background:#FEE;color:#E05555" onclick="deleteTask('${cat.name}',${tidx})" title="削除">🗑</button>
+        </div>`;
+      });
+    }
+  });
+  el.innerHTML = html || `<div style="text-align:center;color:#CCC;padding:20px;font-size:12px">小項目がありません</div>`;
+}
+ 
+function addTask() {
+  const iconEl = document.getElementById("ep-new-task-icon");
+  const nameEl = document.getElementById("ep-new-task-name");
+  const icon = iconEl.value.trim() || "📌";
+  const name = nameEl.value.trim();
+  if (!name) { nameEl.focus(); return; }
+  if (!epSelectedCatForTask) { alert("カテゴリを選択してください"); return; }
+  const cat = CATEGORIES.find(c => c.name === epSelectedCatForTask);
+  if (!cat) return;
+  const id = "custom_" + Date.now();
+  cat.tasks.push({ id, label: name, icon });
+  saveToStorage();
+  iconEl.value = "";
+  nameEl.value = "";
+  renderEpTaskList();
+  renderEpCatList();
+  renderTimerView();
+}
+ 
+function editTask(catName, tidx) {
+  const cat = CATEGORIES.find(c => c.name === catName);
+  if (!cat) return;
+  const task = cat.tasks[tidx];
+  const newLabel = prompt("業務名を編集", task.label);
+  if (!newLabel || newLabel.trim() === task.label) return;
+  task.label = newLabel.trim();
+  saveToStorage();
+  renderEpTaskList();
+  renderTimerView();
+}
+ 
+function deleteTask(catName, tidx) {
+  const cat = CATEGORIES.find(c => c.name === catName);
+  if (!cat) return;
+  const task = cat.tasks[tidx];
+  if (!confirm(`「${task.label}」を削除しますか？`)) return;
+  // Remove from taskOrder
+  Object.keys(taskOrder).forEach(cn => {
+    taskOrder[cn] = (taskOrder[cn] || []).filter(id => id !== task.id);
+  });
+  cat.tasks.splice(tidx, 1);
+  saveToStorage();
+  renderEpTaskList();
+  renderEpCatList();
+  renderTimerView();
 }
  
 // ===== TOUCH DRAG SUPPORT =====
@@ -535,18 +886,9 @@ function setupTouchDrag(container) {
       container.querySelectorAll(".task-btn").forEach(b => b.classList.remove("drag-over"));
       const els = document.elementsFromPoint(touch.clientX, touch.clientY);
       const target = els.find(el => el.classList.contains("task-btn") && el !== btn);
-      if (target && target.dataset.cat === dragSrcCat && target.dataset.task !== dragSrcId) {
-        const cat = CATEGORIES.find(c=>c.name===dragSrcCat);
-        const ordered = getOrderedTasks(cat).map(t=>t.id);
-        const fromIdx = ordered.indexOf(dragSrcId);
-        const toIdx = ordered.indexOf(target.dataset.task);
-        if (fromIdx !== -1 && toIdx !== -1) {
-          ordered.splice(fromIdx, 1);
-          ordered.splice(toIdx, 0, dragSrcId);
-          taskOrder[dragSrcCat] = ordered;
-          saveToStorage();
-          renderTimerView();
-        }
+      if (target && target.dataset.task !== dragSrcId) {
+        const targetCat = target.dataset.cat;
+        moveCrossCategory(dragSrcId, dragSrcCat, targetCat, target.dataset.task);
       }
       dragEl=null; dragSrcId=null; dragSrcCat=null;
     });
