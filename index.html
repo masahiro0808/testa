@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="介護タイムメモ" />
+  <title>介護タイムメモ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;600;700&display=swap" rel="stylesheet" />
+  <!-- SheetJS for Excel export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+    html, body { height: 100%; background: #F0EDE8; font-family: 'Noto Sans JP', 'Hiragino Sans', sans-serif; }
+    button { font-family: inherit; cursor: pointer; }
+    button:active { opacity: 0.82; }
+    input { font-family: inherit; }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-thumb { background: #D0CDC8; border-radius: 4px; }
+    #app { max-width: 430px; margin: 0 auto; min-height: 100vh; background: #F0EDE8; padding-bottom: 90px; }
+
+    /* Modal */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.55); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 24px; }
+    .modal-box { background: #fff; border-radius: 20px; padding: 28px; width: 100%; max-width: 360px; }
+    .modal-icon { font-size: 22px; text-align: center; margin-bottom: 6px; }
+    .modal-title { font-size: 17px; font-weight: 700; color: #2B3F5C; text-align: center; margin-bottom: 6px; }
+    .modal-sub { font-size: 12px; color: #AAA; text-align: center; margin-bottom: 20px; }
+    .modal-input { width: 100%; padding: 13px 14px; border: 2px solid #D0CCC8; border-radius: 12px; font-size: 16px; outline: none; margin-bottom: 14px; }
+    .modal-input:focus { border-color: #2B3F5C; }
+    .modal-btn { width: 100%; padding: 14px; background: #2B3F5C; border: none; border-radius: 12px; color: #fff; font-size: 15px; font-weight: 700; }
+    .modal-btn:disabled { background: #CCC; cursor: not-allowed; }
+    .modal-cancel { width: 100%; padding: 11px; margin-top: 8px; background: none; border: none; color: #AAA; font-size: 13px; }
+
+    /* Header */
+    .header { background: #2B3F5C; padding: 16px 18px 13px; position: sticky; top: 0; z-index: 20; box-shadow: 0 2px 16px rgba(0,0,0,0.22); }
+    .header-row { display: flex; justify-content: space-between; align-items: center; }
+    .header-label { color: #7A9EC8; font-size: 10px; letter-spacing: 3px; margin-bottom: 1px; }
+    .header-title { color: #fff; font-size: 18px; font-weight: 700; }
+    .header-total-label { color: #7A9EC8; font-size: 10px; text-align: right; }
+    .header-total-val { color: #4EDBA8; font-size: 16px; font-weight: 700; text-align: right; }
+    .staff-row { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
+    .staff-badge { display: flex; align-items: center; gap: 7px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.18); border-radius: 20px; padding: 5px 12px 5px 8px; }
+    .staff-badge span { color: #fff; font-size: 13px; font-weight: 600; }
+    .staff-badge small { color: #7A9EC8; font-size: 10px; }
+    .saving-label { color: #7A9EC8; font-size: 10px; }
+    .active-task-bar { margin-top: 10px; background: rgba(78,219,168,0.12); border: 1.5px solid rgba(78,219,168,0.4); border-radius: 12px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
+    .active-task-left { display: flex; align-items: center; gap: 9px; }
+    .pulse-dot { width: 8px; height: 8px; border-radius: 50%; background: #4EDBA8; transition: all 0.5s; }
+    .active-task-name { color: #fff; font-size: 13px; font-weight: 600; }
+    .active-task-hint { color: #7A9EC8; font-size: 10px; }
+    .active-task-time { color: #4EDBA8; font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+    /* Tabs */
+    .tabs { display: flex; background: #fff; border-bottom: 1px solid #E0DDD8; position: sticky; z-index: 15; }
+    .tab-btn { flex: 1; padding: 12px 0; border: none; background: none; font-size: 11px; color: #AAA; border-bottom: 2.5px solid transparent; }
+    .tab-btn.active { font-weight: 700; color: #2B3F5C; border-bottom-color: #2B3F5C; }
+
+    /* Timer view */
+    .timer-view { padding: 14px; }
+    .cat-header { width: 100%; padding: 9px 14px; border: none; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 0; }
+    .cat-header.open { margin-bottom: 8px; }
+    .cat-header-name { color: #fff; font-size: 13px; font-weight: 700; }
+    .cat-header-count { color: rgba(255,255,255,0.7); font-size: 11px; }
+    .task-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 7px; margin-bottom: 8px; }
+    .task-btn { border-radius: 12px; padding: 12px 6px 10px; text-align: center; border: 1.5px solid #E4E0DA; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.06); transition: all 0.15s; }
+    .task-btn.active { transform: scale(0.96); }
+    .task-icon { font-size: 22px; margin-bottom: 4px; }
+    .task-label { font-size: 11px; font-weight: 700; color: #2B3F5C; line-height: 1.3; }
+    .task-label.active { color: #fff; }
+    .task-elapsed { font-size: 12px; color: #fff; font-weight: 700; margin-top: 3px; font-variant-numeric: tabular-nums; }
+    .stop-btn { position: fixed; bottom: 84px; left: 50%; transform: translateX(-50%); width: calc(100% - 28px); max-width: 402px; padding: 15px; background: #E05555; border: none; border-radius: 14px; color: #fff; font-size: 15px; font-weight: 700; box-shadow: 0 4px 18px rgba(224,85,85,0.45); z-index: 50; }
+
+    /* Timeline */
+    .timeline-view { padding: 14px 14px 0; }
+    .timeline-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .timeline-scroll { overflow-y: auto; background: #fff; border-radius: 14px; border: 1px solid #E4E0DA; position: relative; }
+    .timeline-inner { display: flex; }
+    .hour-labels { width: 44px; flex-shrink: 0; position: relative; }
+    .hour-label { position: absolute; left: 0; right: 0; text-align: right; padding-right: 6px; font-size: 10px; color: #BBB; font-variant-numeric: tabular-nums; }
+    .timeline-grid { flex: 1; position: relative; }
+    .grid-line { position: absolute; left: 0; right: 0; }
+    .current-time-line { position: absolute; left: 0; right: 0; border-top: 2px solid #E05555; z-index: 5; }
+    .current-time-dot { position: absolute; left: -2px; top: -4px; width: 8px; height: 8px; border-radius: 50%; background: #E05555; }
+    .task-block { position: absolute; border-radius: 5px; padding: 2px 3px; overflow: hidden; box-sizing: border-box; }
+    .task-block-name { font-size: 9px; color: #fff; font-weight: 700; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .task-block-time { font-size: 8px; color: rgba(255,255,255,0.85); }
+    .legend { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; padding-bottom: 10px; }
+    .legend-item { display: flex; align-items: center; gap: 4px; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 3px; }
+    .legend-label { font-size: 10px; color: #888; }
+    .empty-msg { text-align: center; color: #CCC; padding: 60px 0; font-size: 13px; }
+
+    /* History */
+    .history-view { padding: 14px; }
+    .excel-btn { width: 100%; padding: 13px; background: #1D7D47; border: none; border-radius: 12px; color: #fff; font-size: 14px; font-weight: 700; margin-bottom: 14px; box-shadow: 0 3px 12px rgba(29,125,71,0.35); display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .excel-btn:disabled { background: #CCC; box-shadow: none; cursor: not-allowed; }
+    .cat-totals { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-bottom: 14px; }
+    .cat-total-card { background: #fff; border-radius: 10px; padding: 10px 12px; }
+    .cat-total-name { font-size: 11px; font-weight: 700; }
+    .cat-total-val { font-size: 15px; font-weight: 700; color: #2B3F5C; margin-top: 2px; }
+    .section-label { font-size: 11px; color: #AAA; letter-spacing: 1px; margin-bottom: 8px; }
+    .record-card { background: #fff; border-radius: 12px; padding: 11px 13px; margin-bottom: 7px; border: 1px solid #EAE6E0; display: flex; align-items: center; gap: 11px; }
+    .record-icon-wrap { width: 38px; height: 38px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 19px; flex-shrink: 0; }
+    .record-info { flex: 1; min-width: 0; }
+    .record-name-row { display: flex; align-items: center; gap: 6px; }
+    .record-name { font-size: 13px; font-weight: 700; color: #2B3F5C; }
+    .record-staff-badge { font-size: 10px; background: #F0EDE8; color: #888; border-radius: 10px; padding: 1px 7px; flex-shrink: 0; }
+    .record-time { font-size: 11px; color: #AAA; margin-top: 2px; }
+    .record-dur { font-size: 13px; font-weight: 700; flex-shrink: 0; }
+    .reset-btn { width: 100%; padding: 11px; margin-top: 8px; background: none; border: 1.5px solid #E4E0DA; border-radius: 10px; color: #BBB; font-size: 12px; }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+<div id="app">
+  <div class="modal-overlay hidden" id="modal">
+    <div class="modal-box">
+      <div class="modal-icon">👤</div>
+      <div class="modal-title" id="modal-title">スタッフ名を登録</div>
+      <div class="modal-sub" id="modal-sub">記録に氏名が自動で付与されます</div>
+      <input class="modal-input" id="staff-input" type="text" placeholder="例：山田 花子" />
+      <button class="modal-btn" id="modal-confirm-btn">登録して開始</button>
+      <button class="modal-cancel hidden" id="modal-cancel-btn">キャンセル</button>
+    </div>
+  </div>
+
+  <div class="header">
+    <div class="header-row">
+      <div>
+        <div class="header-label">CARE TIME LOGGER</div>
+        <div class="header-title">介護タイムメモ</div>
+      </div>
+      <div>
+        <div class="header-total-label">本日合計</div>
+        <div class="header-total-val" id="total-display">—</div>
+      </div>
+    </div>
+    <div class="staff-row">
+      <button class="staff-badge" id="staff-badge-btn">
+        <span>👤</span>
+        <span id="staff-name-display">—</span>
+        <small>▼</small>
+      </button>
+      <span class="saving-label hidden" id="saving-label">保存中...</span>
+    </div>
+    <div class="active-task-bar hidden" id="active-task-bar">
+      <div class="active-task-left">
+        <div class="pulse-dot" id="pulse-dot"></div>
+        <span id="active-icon" style="font-size:15px"></span>
+        <span class="active-task-name" id="active-name"></span>
+        <span class="active-task-hint">タップで停止</span>
+      </div>
+      <div class="active-task-time" id="active-time">00:00</div>
+    </div>
+  </div>
+
+  <div class="tabs" id="tabs">
+    <button class="tab-btn active" data-view="timer">⏱ タイマー</button>
+    <button class="tab-btn" data-view="timeline">📊 タイムライン</button>
+    <button class="tab-btn" data-view="history">📁 履歴</button>
+  </div>
+
+  <div id="view-timer" class="timer-view"></div>
+  <div id="view-timeline" class="timeline-view hidden"></div>
+  <div id="view-history" class="history-view hidden"></div>
+</div>
+
+<script>
+// ===== DATA =====
+const CATEGORIES = [
+  { name:"身体介護", color:"#4A7FB5", tasks:[
+    {id:"排泄",label:"排泄",icon:"🚽"},{id:"移乗",label:"移乗",icon:"🔄"},
+    {id:"体位変換",label:"体位変換",icon:"↔️"},{id:"移動",label:"移動",icon:"🚶"},
+    {id:"一部排泄",label:"一部排泄",icon:"🚻"},{id:"入浴",label:"入浴",icon:"🛁"},
+    {id:"清拭",label:"清拭",icon:"🧼"},{id:"洗面",label:"洗面",icon:"🪥"},
+    {id:"着替え",label:"着替え",icon:"👕"},{id:"口腔ケア",label:"口腔ケア",icon:"🦷"},
+    {id:"問題対応",label:"問題対応",icon:"🆘"},{id:"食事",label:"食事",icon:"🍱"},
+    {id:"水分",label:"水分",icon:"💧"},{id:"機能訓練",label:"機能訓練",icon:"💪"},
+    {id:"医療処置",label:"医療処置",icon:"💉"},
+  ]},
+  { name:"医療・対応", color:"#7EB87A", tasks:[
+    {id:"診察対応",label:"診察対応",icon:"🩺"},{id:"与薬対応",label:"与薬対応",icon:"💊"},
+    {id:"他直接",label:"他直接",icon:"🤝"},{id:"巡回移動",label:"巡回移動",icon:"🔁"},
+    {id:"記録",label:"記録",icon:"📋"},
+  ]},
+  { name:"間接業務", color:"#B8A87A", tasks:[
+    {id:"連絡調整",label:"連絡調整",icon:"📞"},{id:"アセス",label:"アセス",icon:"📝"},
+    {id:"計画",label:"計画",icon:"📅"},{id:"見守準備",label:"見守準備",icon:"👁"},
+    {id:"準備充電",label:"準備充電",icon:"🔋"},{id:"教育指導",label:"教育指導",icon:"📚"},
+    {id:"配薬下膳",label:"配薬下膳",icon:"🍽"},{id:"入浴準備",label:"入浴準備",icon:"🪣"},
+    {id:"リネン",label:"リネン",icon:"🛏"},{id:"居室清掃",label:"居室清掃",icon:"🧹"},
+  ]},
+  { name:"その他", color:"#C87A9B", tasks:[
+    {id:"感染対策",label:"感染対策",icon:"😷"},{id:"他間接",label:"他間接",icon:"📌"},
+    {id:"見守り",label:"見守り",icon:"👀"},{id:"休憩待機",label:"休憩待機",icon:"☕"},
+    {id:"その他",label:"その他",icon:"⚙️"},{id:"生活支援",label:"生活支援",icon:"🏠"},
+    {id:"余暇時間",label:"余暇時間(FREE)",icon:"🕐"},
+  ]},
+];
+const CATEGORY_COLORS = {"身体介護":"#4A7FB5","医療・対応":"#7EB87A","間接業務":"#B8A87A","その他":"#C87A9B"};
+const PX_PER_MIN = 3;
+const KEY_STAFF = "careapp:staffName";
+const KEY_RECORDS = "careapp:records";
+
+// ===== STATE =====
+let staffName = "";
+let records = [];
+let activeTask = null;
+let startTime = null;
+let elapsed = 0;
+let timerInterval = null;
+let pulseState = false;
+let openCat = "身体介護";
+let currentView = "timer";
+let setupMode = "init";
+
+// ===== UTILS =====
+function formatTime(ms) {
+  const s = Math.floor(ms/1000), h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
+  if (h>0) return `${h}:${String(m).padStart(2,"0")}:${String(sec).padStart(2,"0")}`;
+  return `${String(m).padStart(2,"0")}:${String(sec).padStart(2,"0")}`;
+}
+function formatDuration(ms) {
+  const s = Math.floor(ms/1000), h = Math.floor(s/3600), m = Math.floor((s%3600)/60);
+  if (h>0) return `${h}時間${m}分`;
+  if (m>0) return `${m}分${s%60}秒`;
+  return `${s%60}秒`;
+}
+function toHHMM(date) {
+  return date.toLocaleTimeString("ja-JP",{hour:"2-digit",minute:"2-digit",hour12:false});
+}
+function todayStr() {
+  return new Date().toLocaleDateString("ja-JP",{year:"numeric",month:"2-digit",day:"2-digit"});
+}
+function saveToStorage() {
+  try { localStorage.setItem(KEY_STAFF, staffName); } catch(e){}
+  try { localStorage.setItem(KEY_RECORDS, JSON.stringify(records)); } catch(e){}
+}
+function loadFromStorage() {
+  try { staffName = localStorage.getItem(KEY_STAFF) || ""; } catch(e){}
+  try { const r = localStorage.getItem(KEY_RECORDS); if(r) records = JSON.parse(r); } catch(e){}
+}
+
+// ===== MODAL =====
+function showModal(mode) {
+  setupMode = mode;
+  const modal = document.getElementById("modal");
+  const title = document.getElementById("modal-title");
+  const sub = document.getElementById("modal-sub");
+  const confirmBtn = document.getElementById("modal-confirm-btn");
+  const cancelBtn = document.getElementById("modal-cancel-btn");
+  const input = document.getElementById("staff-input");
+  if (mode === "init") {
+    title.textContent = "スタッフ名を登録";
+    sub.textContent = "記録に氏名が自動で付与されます";
+    confirmBtn.textContent = "登録して開始";
+    cancelBtn.classList.add("hidden");
+    input.value = "";
+  } else {
+    title.textContent = "スタッフ名を変更";
+    sub.textContent = "変更後の記録から新しい名前が使われます";
+    confirmBtn.textContent = "変更する";
+    cancelBtn.classList.remove("hidden");
+    input.value = staffName;
+  }
+  modal.classList.remove("hidden");
+  setTimeout(() => input.focus(), 100);
+}
+function hideModal() {
+  document.getElementById("modal").classList.add("hidden");
+}
+document.getElementById("modal-confirm-btn").addEventListener("click", () => {
+  const val = document.getElementById("staff-input").value.trim();
+  if (!val) return;
+  staffName = val;
+  saveToStorage();
+  hideModal();
+  updateHeader();
+});
+document.getElementById("staff-input").addEventListener("keydown", e => {
+  if (e.key === "Enter") document.getElementById("modal-confirm-btn").click();
+});
+document.getElementById("modal-cancel-btn").addEventListener("click", hideModal);
+document.getElementById("staff-badge-btn").addEventListener("click", () => showModal("edit"));
+
+// ===== HEADER =====
+function updateHeader() {
+  document.getElementById("staff-name-display").textContent = staffName || "未設定";
+  const totalMs = records.reduce((s,r)=>s+r.duration,0);
+  document.getElementById("total-display").textContent = totalMs > 0 ? formatDuration(totalMs) : "—";
+}
+
+// ===== TIMER =====
+function startTask(task) {
+  if (activeTask) stopTask();
+  activeTask = task;
+  startTime = Date.now();
+  elapsed = 0;
+  timerInterval = setInterval(() => {
+    elapsed = Date.now() - startTime;
+    pulseState = !pulseState;
+    updateActiveBar();
+    renderTimerView(); // refresh task btn elapsed
+  }, 1000);
+  updateActiveBar();
+  renderTimerView();
+}
+function stopTask() {
+  if (!activeTask) return;
+  clearInterval(timerInterval);
+  timerInterval = null;
+  const now = Date.now();
+  const duration = now - startTime;
+  const rec = {
+    id: now,
+    staffName,
+    taskId: activeTask.id,
+    label: activeTask.label,
+    icon: activeTask.icon,
+    categoryName: activeTask.categoryName,
+    categoryColor: activeTask.categoryColor,
+    duration,
+    startMs: startTime,
+    endMs: now,
+    startStr: toHHMM(new Date(startTime)),
+    endStr: toHHMM(new Date(now)),
+    date: todayStr(),
+  };
+  records.push(rec);
+  saveToStorage();
+  activeTask = null; startTime = null; elapsed = 0;
+  updateActiveBar();
+  updateHeader();
+  renderCurrentView();
+}
+function updateActiveBar() {
+  const bar = document.getElementById("active-task-bar");
+  const stopBtn = document.getElementById("stop-btn");
+  if (activeTask) {
+    bar.classList.remove("hidden");
+    document.getElementById("active-icon").textContent = activeTask.icon;
+    document.getElementById("active-name").textContent = activeTask.label;
+    document.getElementById("active-time").textContent = formatTime(elapsed);
+    document.getElementById("pulse-dot").style.boxShadow = pulseState ? "0 0 10px #4EDBA8" : "none";
+    document.getElementById("pulse-dot").style.background = pulseState ? "#4EDBA8" : "#2EC88A";
+    if (stopBtn) {
+      stopBtn.textContent = `⏹ ${activeTask.label} を停止して記録する`;
+    }
+  } else {
+    bar.classList.add("hidden");
+  }
+  // update tab sticky top
+  const tabEl = document.getElementById("tabs");
+  tabEl.style.top = activeTask ? "162px" : "110px";
+}
+document.getElementById("active-task-bar").addEventListener("click", stopTask);
+
+// ===== TABS =====
+document.getElementById("tabs").addEventListener("click", e => {
+  const btn = e.target.closest("[data-view]");
+  if (!btn) return;
+  currentView = btn.dataset.view;
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.toggle("active", b.dataset.view === currentView));
+  renderCurrentView();
+  if (currentView === "timeline") scrollTimelineToNow();
+});
+function renderCurrentView() {
+  ["timer","timeline","history"].forEach(v => {
+    document.getElementById("view-"+v).classList.toggle("hidden", v !== currentView);
+  });
+  if (currentView === "timer") renderTimerView();
+  if (currentView === "timeline") renderTimeline();
+  if (currentView === "history") renderHistory();
+}
+
+// ===== TIMER VIEW =====
+function renderTimerView() {
+  const el = document.getElementById("view-timer");
+  let html = "";
+  CATEGORIES.forEach(cat => {
+    const isOpen = openCat === cat.name;
+    html += `<div style="margin-bottom:11px">
+      <button class="cat-header${isOpen?" open":""}" style="background:${cat.color}" data-cat="${cat.name}">
+        <span class="cat-header-name">${cat.name}</span>
+        <span class="cat-header-count">${isOpen?"▲":"▼"} ${cat.tasks.length}項目</span>
+      </button>`;
+    if (isOpen) {
+      html += `<div class="task-grid">`;
+      cat.tasks.forEach(task => {
+        const isActive = activeTask && activeTask.id === task.id;
+        const border = isActive ? `2px solid ${cat.color}` : "1.5px solid #E4E0DA";
+        const bg = isActive ? cat.color : "#fff";
+        const shadow = isActive ? `0 3px 14px ${cat.color}55` : "0 1px 3px rgba(0,0,0,0.06)";
+        const scale = isActive ? "scale(0.96)" : "scale(1)";
+        html += `<button class="task-btn${isActive?" active":""}" style="background:${bg};border:${border};box-shadow:${shadow};transform:${scale}" data-task="${task.id}" data-cat="${cat.name}">
+          <div class="task-icon">${task.icon}</div>
+          <div class="task-label${isActive?" active":""}">${task.label}</div>
+          ${isActive ? `<div class="task-elapsed">${formatTime(elapsed)}</div>` : ""}
+        </button>`;
+      });
+      html += `</div>`;
+    }
+    html += `</div>`;
+  });
+  if (activeTask) {
+    html += `<button class="stop-btn" id="stop-btn">⏹ ${activeTask.label} を停止して記録する</button>`;
+  }
+  el.innerHTML = html;
+  el.querySelectorAll(".cat-header").forEach(btn => {
+    btn.addEventListener("click", () => {
+      openCat = openCat === btn.dataset.cat ? null : btn.dataset.cat;
+      renderTimerView();
+    });
+  });
+  el.querySelectorAll(".task-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const catName = btn.dataset.cat;
+      const taskId = btn.dataset.task;
+      const cat = CATEGORIES.find(c=>c.name===catName);
+      const task = cat.tasks.find(t=>t.id===taskId);
+      const taskInfo = {...task, categoryColor:cat.color, categoryName:cat.name};
+      if (activeTask && activeTask.id === taskId) stopTask();
+      else startTask(taskInfo);
+    });
+  });
+  const stopBtn = el.querySelector(".stop-btn");
+  if (stopBtn) stopBtn.addEventListener("click", stopTask);
+}
+
+// ===== TIMELINE =====
+function buildTimelineColumns() {
+  const sorted = [...records].sort((a,b)=>a.startMs-b.startMs);
+  const cols = [];
+  sorted.forEach(rec => {
+    let placed = false;
+    for (let i=0;i<cols.length;i++) {
+      if (cols[i][cols[i].length-1].endMs <= rec.startMs) { cols[i].push(rec); placed=true; break; }
+    }
+    if (!placed) cols.push([rec]);
+  });
+  return cols;
+}
+function scrollTimelineToNow() {
+  setTimeout(() => {
+    const el = document.getElementById("timeline-scroll");
+    if (el) {
+      const now = new Date();
+      el.scrollTop = Math.max(0, (now.getHours()*60+now.getMinutes())*PX_PER_MIN - 120);
+    }
+  }, 50);
+}
+function renderTimeline() {
+  const el = document.getElementById("view-timeline");
+  const totalHeight = 24*60*PX_PER_MIN;
+  const cols = buildTimelineColumns();
+  const now = new Date();
+  const nowTop = (now.getHours()*60+now.getMinutes())*PX_PER_MIN;
+
+  let blocksHtml = "";
+  cols.forEach((col, ci) => {
+    col.forEach(rec => {
+      const startMin = new Date(rec.startMs).getHours()*60+new Date(rec.startMs).getMinutes();
+      const endMin = new Date(rec.endMs).getHours()*60+new Date(rec.endMs).getMinutes();
+      const durMin = Math.max(endMin-startMin,1);
+      const colW = 100/cols.length;
+      const h = Math.max(durMin*PX_PER_MIN-2,18);
+      blocksHtml += `<div class="task-block" title="${rec.staffName}: ${rec.label} (${rec.startStr}〜${rec.endStr})"
+        style="top:${startMin*PX_PER_MIN+1}px;height:${h}px;left:${ci*colW+0.5}%;width:${colW-1}%;background:${rec.categoryColor}CC;border:1px solid ${rec.categoryColor}">
+        <div class="task-block-name">${rec.icon} ${rec.label}</div>
+        ${durMin>=5?`<div class="task-block-time">${rec.startStr}〜${rec.endStr}</div>`:""}
+      </div>`;
+    });
+  });
+
+  let gridHtml = "";
+  for (let h=0;h<24;h++) {
+    gridHtml += `<div class="grid-line" style="top:${h*60*PX_PER_MIN}px;border-top:${h%6===0?"1.5px solid #D8D4CE":"1px solid #EDE9E4"}"></div>`;
+  }
+
+  let hourLabels = "";
+  for (let h=0;h<24;h++) {
+    hourLabels += `<div class="hour-label" style="top:${h*60*PX_PER_MIN-7}px">${String(h).padStart(2,"0")}:00</div>`;
+  }
+
+  let legendHtml = Object.entries(CATEGORY_COLORS).map(([name,color])=>
+    `<div class="legend-item"><div class="legend-dot" style="background:${color}"></div><span class="legend-label">${name}</span></div>`
+  ).join("");
+
+  el.innerHTML = `
+    <div class="timeline-header">
+      <div style="font-size:12px;color:#888">24時間タイムライン</div>
+      <div style="font-size:11px;color:#AAA">${todayStr()} — ${staffName}</div>
+    </div>
+    ${records.length===0
+      ? `<div class="empty-msg">まだ記録がありません<br>タイマーで業務を記録してください</div>`
+      : `<div class="timeline-scroll" id="timeline-scroll" style="height:calc(100vh - 230px)">
+          <div class="timeline-inner" style="min-height:${totalHeight}px">
+            <div class="hour-labels" style="height:${totalHeight}px">${hourLabels}</div>
+            <div class="timeline-grid" style="height:${totalHeight}px">
+              ${gridHtml}
+              <div class="current-time-line" style="top:${nowTop}px">
+                <div class="current-time-dot"></div>
+              </div>
+              ${blocksHtml}
+            </div>
+          </div>
+        </div>`
+    }
+    <div class="legend">${legendHtml}</div>
+  `;
+  scrollTimelineToNow();
+}
+
+// ===== HISTORY =====
+function renderHistory() {
+  const el = document.getElementById("view-history");
+  const catTotals = {};
+  records.forEach(r => { catTotals[r.categoryName]=(catTotals[r.categoryName]||0)+r.duration; });
+
+  let catHtml = Object.entries(catTotals).map(([name,ms])=>`
+    <div class="cat-total-card" style="border:1.5px solid ${CATEGORY_COLORS[name]||"#ddd"}">
+      <div class="cat-total-name" style="color:${CATEGORY_COLORS[name]||"#888"}">${name}</div>
+      <div class="cat-total-val">${formatDuration(ms)}</div>
+    </div>`).join("");
+
+  let recHtml = [...records].reverse().map(r=>`
+    <div class="record-card">
+      <div class="record-icon-wrap" style="background:${r.categoryColor}22">${r.icon}</div>
+      <div class="record-info">
+        <div class="record-name-row">
+          <span class="record-name">${r.label}</span>
+          <span class="record-staff-badge">👤 ${r.staffName}</span>
+        </div>
+        <div class="record-time">${r.startStr} → ${r.endStr}</div>
+      </div>
+      <div class="record-dur" style="color:${r.categoryColor}">${formatDuration(r.duration)}</div>
+    </div>`).join("");
+
+  el.innerHTML = `
+    <button class="excel-btn" id="excel-btn" ${records.length===0?"disabled":""}>
+      <span style="font-size:18px">📥</span> Excelでダウンロード (.xlsx)
+    </button>
+    ${Object.keys(catTotals).length>0?`
+      <div class="section-label">カテゴリ別 合計</div>
+      <div class="cat-totals">${catHtml}</div>`:""}
+    <div class="section-label">記録一覧（新しい順）</div>
+    ${records.length===0?`<div class="empty-msg">まだ記録がありません</div>`:recHtml}
+    ${records.length>0?`<button class="reset-btn" id="reset-btn">🗑 記録をすべてリセット</button>`:""}
+  `;
+
+  document.getElementById("excel-btn").addEventListener("click", downloadExcel);
+  const resetBtn = document.getElementById("reset-btn");
+  if (resetBtn) {
+    resetBtn.addEventListener("click", () => {
+      if (confirm("記録をすべて削除しますか？")) {
+        records = [];
+        saveToStorage();
+        updateHeader();
+        renderHistory();
+      }
+    });
+  }
+}
+
+// ===== EXCEL =====
+function downloadExcel() {
+  const data = records.map(r=>({
+    "日付": r.date,
+    "スタッフ名": r.staffName,
+    "カテゴリ": r.categoryName,
+    "業務名": r.label,
+    "開始時刻": r.startStr,
+    "終了時刻": r.endStr,
+    "所要時間(秒)": Math.floor(r.duration/1000),
+    "所要時間(分)": (r.duration/60000).toFixed(1),
+  }));
+  const summaryMap = {};
+  records.forEach(r => {
+    const key = r.staffName+"___"+r.label;
+    summaryMap[key]=(summaryMap[key]||0)+r.duration;
+  });
+  const summary = Object.entries(summaryMap).map(([key,ms])=>{
+    const [staff,label]=key.split("___");
+    return {"スタッフ名":staff,"業務名":label,"合計時間(分)":(ms/60000).toFixed(1),"合計時間(時:分)":`${Math.floor(ms/3600000)}:${String(Math.floor((ms%3600000)/60000)).padStart(2,"0")}`};
+  });
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data), "記録一覧");
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(summary), "スタッフ別集計");
+  XLSX.writeFile(wb, `介護タイム記録_${new Date().toLocaleDateString("ja-JP").replace(/\//g,"-")}.xlsx`);
+}
+
+// ===== INIT =====
+loadFromStorage();
+updateHeader();
+if (!staffName) showModal("init");
+renderTimerView();
+</script>
+</body>
+</html>
