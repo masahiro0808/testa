@@ -315,6 +315,7 @@
       </div>
  
       <button class="edit-close-btn" style="width:100%;margin-top:16px" onclick="closeEditPanel()">閉じる</button>
+      <button onclick="exportHTML()" style="width:100%;margin-top:10px;padding:13px;background:#1D7D47;border:none;border-radius:12px;color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer"><span style="font-size:16px">💾</span> 項目設定をHTMLファイルで保存</button>
     </div>
   </div>
   <!-- Rename Staff Modal -->
@@ -1756,7 +1757,22 @@ function setupTouchDrag(container) {
     dragBtn = null; dragSrcId = null; dragSrcCat = null;
   });
 }
-// ===== TIMELINE =====
+ 
+// ===== EXPORT HTML =====
+function exportHTML() {
+  // 現在のページのHTMLを取得し、DEFAULT_CATEGORIESを現在のCATEGORIESで書き換えて出力
+  const src = document.documentElement.outerHTML;
+  const newDefault = `const DEFAULT_CATEGORIES = ${JSON.stringify(CATEGORIES, null, 2)};`;
+  const replaced = src.replace(/const DEFAULT_CATEGORIES = \[[\s\S]*?\];/, newDefault);
+  const blob = new Blob([replaced], { type: "text/html;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "index.html";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+ 
 function buildTimelineColumns() {
   const sorted = [...records].sort((a,b)=>a.startMs-b.startMs);
   const cols = [];
