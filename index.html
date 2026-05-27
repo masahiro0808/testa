@@ -1276,7 +1276,16 @@ function renderTimerView() {
       const catName = btn.dataset.cat;
       const taskId = btn.dataset.task;
       const cat = CATEGORIES.find(c=>c.name===catName);
-      const task = cat.tasks.find(t=>t.id===taskId);
+      if (!cat) return;
+      // 未分類小項目とグループ内小項目の両方から検索
+      let task = cat.tasks.find(t=>t.id===taskId);
+      if (!task) {
+        for (const grp of (cat.groups || [])) {
+          task = grp.tasks.find(t=>t.id===taskId);
+          if (task) break;
+        }
+      }
+      if (!task) return;
       const taskInfo = {...task, categoryColor:cat.color, categoryName:cat.name};
       if (activeTask && activeTask.id === taskId) stopTask();
       else startTask(taskInfo);
@@ -2079,7 +2088,14 @@ function setupTouchDrag(container) {
     const taskId = btn.dataset.task;
     const cat = CATEGORIES.find(c => c.name === catName);
     if (!cat) return;
-    const task = cat.tasks.find(t => t.id === taskId);
+    // 未分類小項目とグループ内小項目の両方から検索
+    let task = cat.tasks.find(t => t.id === taskId);
+    if (!task) {
+      for (const grp of (cat.groups || [])) {
+        task = grp.tasks.find(t => t.id === taskId);
+        if (task) break;
+      }
+    }
     if (!task) return;
     btn._touchHandled = true;
     const taskInfo = {...task, categoryColor: cat.color, categoryName: cat.name};
@@ -2157,10 +2173,51 @@ function setupTouchDrag(container) {
 // ===== EXPORT HTML =====
 function exportHTML() {
   // 現在のページのHTMLを取得し、DEFAULT_CATEGORIESを現在のCATEGORIESで書き換えて出力
-  const src = document.documentElement.outerHTML;
+  let src = document.documentElement.outerHTML;
+ 
+  // DEFAULT_CATEGORIES を現在の設定で置き換え
   const newDefault = `const DEFAULT_CATEGORIES = ${JSON.stringify(CATEGORIES, null, 2)};`;
-  const replaced = src.replace(/const DEFAULT_CATEGORIES = \[[\s\S]*?\];/, newDefault);
-  const blob = new Blob([replaced], { type: "text/html;charset=utf-8" });
+  src = src.replace(/const DEFAULT_CATEGORIES = \[[\s\S]*?\];/, newDefault);
+ 
+  // ── ホーム画面（スタッフ選択モーダル）に戻すための修正 ──
+  // staffName / staffList / records などをリセット済みの初期値に置き換え
+  src = src.replace(/let staffName = "[^"]*";/, 'let staffName = "";');
+  src = src.replace(/let staffList = \[[\s\S]*?\]; \/\/ all saved staff names/, 'let staffList = []; // all saved staff names');
+ 
+  // header内に表示されているスタッフ名・合計時間を初期値に戻す
+  // （outerHTMLに焼き付いた表示テキストをリセット）
+  src = src.replace(
+    /(<div class="header-total-val" id="total-display">)[^<]*/,
+    '$1—'
+  );
+  src = src.replace(
+    /(<span id="staff-name-display">)[^<]*/,
+    '$1未設定'
+  );
+  // active-task-bar を hidden に戻す
+  src = src.replace(
+    /(<div class="active-task-bar)(?! hidden)/,
+    '$1 hidden'
+  );
+  // active-task-bar のテキスト表示もリセット
+  src = src.replace(
+    /(<span class="active-task-name" id="active-name">)[^<]*/,
+    '$1'
+  );
+  src = src.replace(
+    /(<div class="active-task-time" id="active-time">)[^<]*/,
+    '$100:00'
+  );
+ 
+  // saving-label を hidden のまま維持（すでに hidden なら問題なし）
+ 
+  // total-display のヘッダー値をリセット（秒数などが残っている場合）
+  src = src.replace(
+    /(<div class="header-total-val" id="total-display">)\d+秒/,
+    '$1—'
+  );
+ 
+  const blob = new Blob([src], { type: "text/html;charset=utf-8" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
@@ -2338,8 +2395,8 @@ updateHeader();
 if (!staffName) showModal("init");
 renderTimerView();
 </script>
-
-
  
-
+ 
+ 
+ 
 </body></html>
