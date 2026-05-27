@@ -233,7 +233,6 @@
       </button>
       <span class="saving-label hidden" id="saving-label">保存中...</span>
       <button class="edit-manage-btn" onclick="openEditPanel()">⚙️ 項目管理</button>
-      <button class="refresh-btn" id="undo-btn" onclick="undo()" style="">↩ 戻す</button>
       <button class="refresh-btn" id="refresh-btn"><span id="refresh-icon">🔄</span> 更新</button>
     </div>
     <div class="active-task-bar hidden" id="active-task-bar">
@@ -395,7 +394,7 @@
   </div>
  
   <!-- Edit Panel -->
-  <div class="edit-overlay" id="edit-panel-overlay">
+  <div class="edit-overlay hidden" id="edit-panel-overlay">
     <div class="edit-panel" id="edit-panel">
       <div class="edit-panel-handle"></div>
       <div class="edit-panel-title" id="ep-title">カテゴリ・項目の管理</div>
@@ -1061,19 +1060,7 @@ function updateHeader() {
 }
  
 document.getElementById("refresh-btn").addEventListener("click", () => {
-  if (!confirm("更新すると、カテゴリ・小項目の並び順と構成が最新バージョンにリセットされます。\n記録とスタッフ名は保持されます。よろしいですか？")) return;
-  const icon = document.getElementById("refresh-icon");
-  icon.classList.add("spin");
-  setTimeout(() => icon.classList.remove("spin"), 500);
-  // Reset categories and task order to default (latest code), keep records & staff
-  CATEGORIES = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
-  taskOrder = {};
-  undoStack = [];
-  syncUndoBtn();
-  rebuildCategoryColors();
-  saveToStorage();
-  updateHeader();
-  renderCurrentView();
+  location.reload();
 });
  
 // ===== TIMER =====
@@ -2183,6 +2170,10 @@ function exportHTML() {
   // staffName / staffList / records などをリセット済みの初期値に置き換え
   src = src.replace(/let staffName = "[^"]*";/, 'let staffName = "";');
   src = src.replace(/let staffList = \[[\s\S]*?\]; \/\/ all saved staff names/, 'let staffList = []; // all saved staff names');
+  // カテゴリをすべて折りたたんだ状態にする（添付画像の初期状態）
+  src = src.replace(/let openCats = new Set\(\[[^\]]*\]\);[^\n]*/, 'let openCats = new Set(); // Set of open category names');
+  // 保存HTMLを開いたときモーダルを表示しない
+  src = src.replace(/if \(!staffName\) showModal\("init"\);/, '// auto-modal disabled on saved file');
  
   // header内に表示されているスタッフ名・合計時間を初期値に戻す
   // （outerHTMLに焼き付いた表示テキストをリセット）
@@ -2193,6 +2184,16 @@ function exportHTML() {
   src = src.replace(
     /(<span id="staff-name-display">)[^<]*/,
     '$1未設定'
+  );
+  // edit-panel-overlay を hidden に戻す（開いた状態で保存されていても閉じる）
+  src = src.replace(
+    /(<div class="edit-overlay" id="edit-panel-overlay")(?![^>]*hidden)/,
+    '$1 class="edit-overlay hidden" id="edit-panel-overlay"'
+  );
+  // さらに確実に: class属性ごと書き換え
+  src = src.replace(
+    /<div class="edit-overlay" id="edit-panel-overlay">/g,
+    '<div class="edit-overlay hidden" id="edit-panel-overlay">'
   );
   // active-task-bar を hidden に戻す
   src = src.replace(
@@ -2215,6 +2216,22 @@ function exportHTML() {
   src = src.replace(
     /(<div class="header-total-val" id="total-display">)\d+秒/,
     '$1—'
+  );
+ 
+  // 各ビューに焼き付いた動的コンテンツをクリア（開いたとき正しく再描画される）
+  src = src.replace(
+    /(<div id="view-history" class="[^"]*">)[\s\S]*?(<\/div>\s*\n\s*\n\s*<\!-- Edit Panel)/,
+    '$1\n  $2'
+  );
+  // view-timer の中身もクリア（renderTimerView()で再生成される）
+  src = src.replace(
+    /(<div id="view-timer" class="[^"]*">)[\s\S]*?(<\/div>\s*\n\s*<div id="view-timeline")/,
+    '$1\n  $2'
+  );
+  // view-timeline の中身もクリア
+  src = src.replace(
+    /(<div id="view-timeline" class="[^"]*">)[\s\S]*?(<\/div>\s*\n\s*<div id="view-history")/,
+    '$1\n  $2'
   );
  
   const blob = new Blob([src], { type: "text/html;charset=utf-8" });
@@ -2355,11 +2372,15 @@ function renderHistory() {
   document.getElementById("excel-btn").addEventListener("click", downloadExcel);
 }
 function resetAllRecords() {
-  if (!confirm("このスタッフの記録をすべて削除しますか？")) return;
-  records = [];
-  saveToStorage();
-  updateHeader();
-  renderHistory();
+  showDeleteConfirm(
+    "このスタッフの記録をすべて削除しますか？",
+    () => {
+      records = [];
+      saveToStorage();
+      updateHeader();
+      renderHistory();
+    }
+  );
 }
  
 // ===== EXCEL =====
@@ -2393,6 +2414,9 @@ function downloadExcel() {
 loadFromStorage();
 updateHeader();
 if (!staffName) showModal("init");
+// 各ビューを初期化して焼き付いたコンテンツを上書き
+renderHistory();
+renderTimeline();
 renderTimerView();
 </script>
  
