@@ -81,6 +81,7 @@
     .task-btn.active { transform: scale(0.96); }
     .task-btn.dragging { opacity: 0.4; cursor: grabbing; transform: scale(0.95); }
     .task-btn.drag-over { border: 2px dashed #2B3F5C !important; background: #F0EDE8 !important; }
+    .task-btn.long-pressing { transform: scale(0.93) !important; opacity: 0.75; transition: transform 0.3s, opacity 0.3s; }
     .drag-hint { font-size: 10px; color: #CCC; text-align: center; margin-bottom: 4px; letter-spacing: 0.5px; }
     .task-icon { font-size: 22px; margin-bottom: 4px; }
     .task-label { font-size: 11px; font-weight: 700; color: #2B3F5C; line-height: 1.3; }
@@ -2026,6 +2027,8 @@ function setupTouchDrag(container) {
   let clone = null, dragSrcId = null, dragSrcCat = null, dragBtn = null;
   let offsetX = 0, offsetY = 0, moved = false;
   let autoOpenTimer = null, lastHoveredCat = null;
+  let longPressTimer = null, longPressBtn = null, longPressTouch = null;
+  const LONG_PRESS_MS = 2000;
  
   function cancelAutoOpen() {
     clearTimeout(autoOpenTimer);
@@ -2090,17 +2093,34 @@ function setupTouchDrag(container) {
     else startTask(taskInfo);
   }
  
-  // touchstart per btn (to know which btn was pressed)
+  // touchstart per btn: 長押しでドラッグ開始
   container.querySelectorAll(".task-btn").forEach(btn => {
     btn.addEventListener("touchstart", e => {
       moved = false;
-      startDrag(btn, e.touches[0]);
+      longPressBtn = btn;
+      longPressTouch = e.touches[0];
+      // 長押しタイマー開始
+      btn.classList.add("long-pressing");
+      longPressTimer = setTimeout(() => {
+        longPressTimer = null;
+        btn.classList.remove("long-pressing");
+        startDrag(btn, longPressTouch);
+        navigator.vibrate && navigator.vibrate([30]);
+      }, LONG_PRESS_MS);
     }, { passive: true });
   });
  
   // move/end/cancel on container so gaps are covered too
   container.addEventListener("touchmove", e => {
-    if (!clone) return;
+    if (!clone) {
+      // 長押し前に指が動いたらスクロールとみなしてキャンセル
+      if (longPressTimer) {
+        clearTimeout(longPressTimer);
+        longPressTimer = null;
+        if (longPressBtn) { longPressBtn.classList.remove("long-pressing"); longPressBtn = null; }
+      }
+      return;
+    }
     moved = true;
     e.preventDefault();
     const touch = e.touches[0];
@@ -2136,7 +2156,20 @@ function setupTouchDrag(container) {
   }, { passive: false });
  
   container.addEventListener("touchend", e => {
-    if (!clone) return;
+    // 長押し前にtouchend → タップとして処理
+    if (!clone) {
+      if (longPressTimer) {
+        clearTimeout(longPressTimer);
+        longPressTimer = null;
+      }
+      if (longPressBtn) {
+        longPressBtn.classList.remove("long-pressing");
+        const btn = longPressBtn;
+        longPressBtn = null;
+        fireTap(btn);
+      }
+      return;
+    }
     if (!moved) {
       document.body.removeChild(clone); clone = null;
       if (dragBtn) dragBtn.style.opacity = "";
@@ -2150,6 +2183,8 @@ function setupTouchDrag(container) {
   });
  
   container.addEventListener("touchcancel", () => {
+    if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+    if (longPressBtn) { longPressBtn.classList.remove("long-pressing"); longPressBtn = null; }
     if (clone) { document.body.removeChild(clone); clone = null; }
     if (dragBtn) dragBtn.style.opacity = "";
     cancelAutoOpen();
